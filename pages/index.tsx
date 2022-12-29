@@ -1,5 +1,7 @@
-function Home() {
-  return <></>
+import Home from 'views/Home'
+
+function Index() {
+  return <Home />
 }
 
-export default Home
+export default Index

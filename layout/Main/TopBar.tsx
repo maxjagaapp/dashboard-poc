@@ -22,7 +22,7 @@ function TopBar() {
   //*functions
 
   return (
-    <AppBar elevation={0}>
+    <AppBar elevation={0} position="sticky">
       <Toolbar variant="dense">
         <IconButton color="inherit" edge="start">
           <MenuIcon />
