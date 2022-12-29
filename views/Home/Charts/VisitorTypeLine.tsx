@@ -17,7 +17,7 @@ import 'chartjs-adapter-moment'
 import moment from 'moment'
 
 //assets
-import visitorDataHour from 'public/visitor_count_hour.json'
+import visitorDataHour from 'assets/visitor_count_hour.json'
 
 //*lodash
 import groupBy from 'lodash/groupBy'

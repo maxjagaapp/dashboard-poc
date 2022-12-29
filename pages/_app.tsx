@@ -1,18 +1,23 @@
 import Head from 'next/head'
 import { AppProps } from 'next/app'
-import { ThemeProvider } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
-import { CacheProvider, EmotionCache } from '@emotion/react'
-import theme from 'theme'
-import createEmotionCache from 'utils/createEmotionCache'
-import { SWRConfig } from 'swr'
 import axios from 'utils/http-anxios'
+import { SWRConfig } from 'swr'
+
+import theme from 'theme'
+import { CacheProvider, EmotionCache } from '@emotion/react'
+import CssBaseline from '@mui/material/CssBaseline'
+import { ThemeProvider } from '@mui/material/styles'
+
+import createEmotionCache from 'utils/createEmotionCache'
 import { isIsoDate } from 'helpers/dateHelpers'
+import 'config/firebase'
 
 //layout
 import Main from 'layout/Main'
 
-// Client-side cache, shared for the whole session of the user in the browser.
+//components
+import LoginDialog from 'components/LoginDialog'
+
 const clientSideEmotionCache = createEmotionCache()
 
 interface MyAppProps extends AppProps {
@@ -21,6 +26,7 @@ interface MyAppProps extends AppProps {
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+
   return (
     <CacheProvider value={emotionCache}>
       <SWRConfig
@@ -47,8 +53,8 @@ export default function MyApp(props: MyAppProps) {
           <meta name="viewport" content="initial-scale=1, width=device-width" />
         </Head>
         <ThemeProvider theme={theme}>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
+          <LoginDialog />
           <Main>
             <Component {...pageProps} />
           </Main>
