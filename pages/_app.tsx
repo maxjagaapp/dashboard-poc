@@ -8,7 +8,7 @@ import { CacheProvider, EmotionCache } from '@emotion/react'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
 
-import createEmotionCache from 'utils/createEmotionCache'
+import createEmotionCache from 'config/createEmotionCache'
 import { isIsoDate } from 'helpers/dateHelpers'
 import 'config/firebase'
 

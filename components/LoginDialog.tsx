@@ -5,7 +5,7 @@ import * as yup from 'yup'
 
 //*components
 
-//material
+//*material
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
@@ -16,19 +16,23 @@ import DialogTitle from '@mui/material/DialogTitle'
 import TextField from '@mui/material/TextField'
 import CircularProgress from '@mui/material/CircularProgress'
 
-//icons-material
+//*icons-material
 
-//interfaces
+//*interfaces
 
-//hooks
+//*hooks
 import { useFirebaseAuth, loginWithEmailAndPassword } from 'hooks/auth'
 
+//*validation
 const validationSchema = yup.object({
   email: yup
     .string()
     .email('Enter a valid email')
     .required('Email is required'),
-  password: yup.string().min(6, 'Password is less than 6').required('Required'),
+  password: yup
+    .string()
+    .min(6, 'Password is less than 6')
+    .required('Password is required'),
 })
 
 function LoginDialog() {
@@ -43,6 +47,8 @@ function LoginDialog() {
     onSubmit: async (values) => {
       await loginWithEmailAndPassword(values.email, values.password)
     },
+    validateOnChange: true,
+    validateOnBlur: false,
   })
 
   //*states
@@ -78,10 +84,10 @@ function LoginDialog() {
       ) : (
         !isAuth && (
           <>
-            <DialogTitle variant="h3">LOGIN</DialogTitle>
-            <DialogContent>
+            <DialogTitle variant="h4">LOGIN</DialogTitle>
+            <DialogContent dividers>
               <form onSubmit={formik.handleSubmit}>
-                <Stack spacing={2} sx={{ mt: 1 }}>
+                <Stack spacing={2}>
                   <TextField
                     size="small"
                     id="email"
@@ -90,8 +96,8 @@ function LoginDialog() {
                     fullWidth
                     onChange={formik.handleChange}
                     value={formik.values.email}
-                    error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
+                    error={Boolean(formik.errors.email)}
+                    helperText={formik.errors.email}
                   />
                   <TextField
                     size="small"
@@ -101,12 +107,8 @@ function LoginDialog() {
                     fullWidth
                     value={formik.values.password}
                     onChange={formik.handleChange}
-                    error={
-                      formik.touched.password && Boolean(formik.errors.password)
-                    }
-                    helperText={
-                      formik.touched.password && formik.errors.password
-                    }
+                    error={Boolean(formik.errors.password)}
+                    helperText={formik.errors.password}
                   />
                 </Stack>
               </form>
@@ -114,6 +116,7 @@ function LoginDialog() {
             <DialogActions>
               {!loading && (
                 <Button
+                  disabled={!formik.isValid || formik.isSubmitting}
                   variant="contained"
                   type="submit"
                   onClick={formik.submitForm}

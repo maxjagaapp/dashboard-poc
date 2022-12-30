@@ -7,27 +7,26 @@ import {
 import { auth } from 'config/firebase'
 
 export function useFirebaseAuth() {
+  //*states
   const [isAuth, setIsAuth] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
 
+  //*useEffect
   useEffect(() => {
-    try {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          setIsAuth(true)
-          setLoading(false)
-        } else {
-          setIsAuth(false)
-          setLoading(false)
-        }
-      })
-    } catch (error) {
-      console.log('Error:', error)
-    }
+    const unlisten = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuth(true)
+        setLoading(false)
+      } else {
+        setIsAuth(false)
+        setLoading(false)
+      }
+    })
 
     return () => {
       setIsAuth(false)
       setLoading(true)
+      unlisten()
     }
   }, [])
 
