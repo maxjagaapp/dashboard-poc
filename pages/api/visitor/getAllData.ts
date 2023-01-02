@@ -74,7 +74,7 @@ export default async function handler(
     `AND check_in <= TIMESTAMP("${enddate}") ` +
     `GROUP BY document_id ` +
     ') ORDER BY check_in DESC'
-  console.log(query)
+
   try {
     const fetchData = await axios.post('bigQueryRequest', {
       query: query,

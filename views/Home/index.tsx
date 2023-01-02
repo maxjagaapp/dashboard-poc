@@ -4,6 +4,7 @@
 
 //*components
 import VisitorTypeLine from './Charts/VisitorTypeLine'
+import VisitorMonthlyReport from './Reports/VisitorMonthlyReport'
 
 //material
 import Box from '@mui/material/Box'
@@ -29,6 +30,9 @@ function Home() {
       <Grid container spacing={2}>
         <Grid xs={12}>
           <VisitorTypeLine />
+        </Grid>
+        <Grid xs={12}>
+          <VisitorMonthlyReport />
         </Grid>
       </Grid>
     </Box>

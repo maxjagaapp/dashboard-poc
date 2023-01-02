@@ -15,6 +15,7 @@ import { useFirebaseAuth } from 'hooks/auth'
 
 //layout
 import Main from 'layout/Main'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 //components
 import LoginDialog from 'components/LoginDialog'
@@ -25,47 +26,55 @@ interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
 }
 
+// Create a client
+const queryClient = new QueryClient()
+
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
   const { accessToken } = useFirebaseAuth()
 
   return (
-    <CacheProvider value={emotionCache}>
-      <SWRConfig
-        value={{
-          fetcher: async (resource) => {
-            const fetch = await axios.get(resource, {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
-            })
-            const data = JSON.parse(
-              fetch.request.response,
-              function (key, value) {
-                if (typeof value === 'string') {
-                  if (isIsoDate(value)) {
-                    return new Date(value)
+    <QueryClientProvider client={queryClient}>
+      <CacheProvider value={emotionCache}>
+        <SWRConfig
+          value={{
+            fetcher: async (resource) => {
+              const fetch = await axios.get(resource, {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                },
+              })
+              const data = JSON.parse(
+                fetch.request.response,
+                function (key, value) {
+                  if (typeof value === 'string') {
+                    if (isIsoDate(value)) {
+                      return new Date(value)
+                    }
                   }
+                  return value
                 }
-                return value
-              }
-            )
-            return data
-          },
-          revalidateOnFocus: false,
-        }}
-      >
-        <Head>
-          <meta name="viewport" content="initial-scale=1, width=device-width" />
-        </Head>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <LoginDialog />
-          <Main>
-            <Component {...pageProps} />
-          </Main>
-        </ThemeProvider>
-      </SWRConfig>
-    </CacheProvider>
+              )
+              return data
+            },
+            revalidateOnFocus: false,
+          }}
+        >
+          <Head>
+            <meta
+              name="viewport"
+              content="initial-scale=1, width=device-width"
+            />
+          </Head>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <LoginDialog />
+            <Main>
+              <Component {...pageProps} />
+            </Main>
+          </ThemeProvider>
+        </SWRConfig>
+      </CacheProvider>
+    </QueryClientProvider>
   )
 }
