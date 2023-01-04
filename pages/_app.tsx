@@ -11,7 +11,6 @@ import { ThemeProvider } from '@mui/material/styles'
 import createEmotionCache from 'config/createEmotionCache'
 import { isIsoDate } from 'helpers/dateHelpers'
 import 'config/firebase'
-import { useFirebaseAuth } from 'hooks/auth'
 
 //layout
 import Main from 'layout/Main'
@@ -31,7 +30,6 @@ const queryClient = new QueryClient()
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
-  const { accessToken } = useFirebaseAuth()
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -39,11 +37,7 @@ export default function MyApp(props: MyAppProps) {
         <SWRConfig
           value={{
             fetcher: async (resource) => {
-              const fetch = await axios.get(resource, {
-                headers: {
-                  Authorization: `Bearer ${accessToken}`,
-                },
-              })
+              const fetch = await axios.get(resource)
               const data = JSON.parse(
                 fetch.request.response,
                 function (key, value) {

@@ -5,7 +5,6 @@ import TopBar from './TopBar'
 
 //material
 import Box from '@mui/material/Box'
-import { defaultFullVh } from 'utils/constant'
 
 //icons-material
 
@@ -28,13 +27,7 @@ function Main({ children }: MainProps) {
   return (
     <Box>
       <TopBar />
-      <Box
-        sx={{
-          height: defaultFullVh,
-        }}
-      >
-        {children}
-      </Box>
+      <Box>{children}</Box>
     </Box>
   )
 }
