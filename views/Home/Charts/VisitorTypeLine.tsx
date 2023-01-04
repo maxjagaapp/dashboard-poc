@@ -15,6 +15,7 @@ import {
 import { Line } from 'react-chartjs-2'
 import 'chartjs-adapter-moment'
 import moment from 'moment'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 
 //assets
 import visitorDataHour from 'assets/visitor_count_hour.json'
@@ -82,7 +83,8 @@ ChartJS.register(
   TimeScale,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ChartDataLabels
 )
 
 //consts
@@ -257,7 +259,7 @@ function VisitorTypeLine() {
   return (
     <Box component={Paper} sx={{ p: 2 }}>
       <Stack spacing={2} direction="row">
-        <ButtonGroup>
+        <ButtonGroup size="small">
           {dateFormatSelection.map((date) => (
             <Button
               variant={chartDateFormat === date.key ? 'contained' : 'outlined'}
@@ -303,6 +305,9 @@ function VisitorTypeLine() {
               title: {
                 display: true,
                 text: findSelectedChartFormat?.title,
+              },
+              datalabels: {
+                display: false,
               },
             },
             onClick: (event, elements) => {

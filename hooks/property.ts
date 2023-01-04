@@ -12,6 +12,7 @@ export interface PropertyData {
   second_address: string
   city: string
   state: string
+  status: string
 }
 
 export function usePropertyGetAll() {

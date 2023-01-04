@@ -3,6 +3,7 @@
 //*lodash
 
 //*components
+import PropertyTypePie from './Charts/PropertyTypePie'
 import VisitorTypeLine from './Charts/VisitorTypeLine'
 import VisitorMonthlyReport from './Reports/VisitorMonthlyReport'
 
@@ -28,8 +29,11 @@ function Home() {
   return (
     <Box sx={{ p: 2 }}>
       <Grid container spacing={2}>
-        <Grid xs={12}>
+        <Grid xs={9}>
           <VisitorTypeLine />
+        </Grid>
+        <Grid xs={3}>
+          <PropertyTypePie />
         </Grid>
         <Grid xs={12}>
           <VisitorMonthlyReport />

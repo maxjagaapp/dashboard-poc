@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from 'react'
+import moment from 'moment'
 
 //assets
 import visitorPropertyMonth from 'assets/visitor_count_property_month.json'
@@ -17,6 +18,8 @@ import {
   useKeepGroupedColumnsHidden,
   GridColDef,
   GridToolbar,
+  GridValueGetterParams,
+  GridValueFormatterParams,
 } from '@mui/x-data-grid-premium'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
@@ -26,7 +29,6 @@ import Paper from '@mui/material/Paper'
 //*interfaces
 
 //*hooks
-
 import { PropertyData, usePropertyGetAll } from 'hooks/property'
 
 function VisitorMonthlyReport() {
@@ -54,6 +56,7 @@ function VisitorMonthlyReport() {
           others_total: 'sum',
           wrong_visitor_total: 'sum',
           check_in_total: 'sum',
+          total_unit: 'sum',
         },
       },
     },
@@ -89,6 +92,7 @@ function VisitorMonthlyReport() {
         wrong_visitor_total,
         check_in_total,
         month,
+        year,
       } = data
 
       return {
@@ -104,11 +108,10 @@ function VisitorMonthlyReport() {
         others_total: parseInt(others_total),
         wrong_visitor_total: parseInt(wrong_visitor_total),
         check_in_total: parseInt(check_in_total),
-        index: `${index}_${month}`,
+        index: `${index}_${month}_${year}`,
         ...propertyDataByKey[data.property_id],
       }
     })
-    console.log(1, resultData)
     return resultData
   }, [propertyData, isLoading])
 
@@ -125,6 +128,24 @@ function VisitorMonthlyReport() {
     { field: 'second_address', headerName: 'Address 2', minWidth: 200 },
     { field: 'city', headerName: 'City' },
     { field: 'state', headerName: 'State' },
+    {
+      field: 'commencement_at',
+      headerName: 'Commencement Date',
+      minWidth: 150,
+      type: 'date',
+      valueFormatter: (params: GridValueFormatterParams) => {
+        if (params?.value) return moment(params?.value).format('DD/MM/YYYY')
+        return null
+      },
+      valueGetter: (params: GridValueGetterParams) => {
+        return params?.value?.toDate()
+      },
+    },
+    {
+      field: 'total_unit',
+      headerName: 'Total Unit',
+      type: 'number',
+    },
     {
       field: 'delivery_total',
       headerName: 'Delivery',
@@ -178,8 +199,8 @@ function VisitorMonthlyReport() {
   ]
 
   return (
-    <Paper sx={{ height: '100%', overflow: 'hidden', p: 1 }}>
-      <Box sx={{ height: '850px', width: '100%' }}>
+    <Paper sx={{ height: 'calc(100vh - 48px)', overflow: 'hidden', p: 1 }}>
+      <Box sx={{ height: '100%', width: '100%' }}>
         <DataGridPremium
           apiRef={apiRef}
           density="compact"
