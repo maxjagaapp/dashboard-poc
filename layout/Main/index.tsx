@@ -5,6 +5,7 @@ import TopBar from './TopBar'
 
 //material
 import Box from '@mui/material/Box'
+import { useFirebaseAuth } from 'hooks/auth'
 
 //icons-material
 
@@ -15,6 +16,7 @@ interface MainProps {
 
 function Main({ children }: MainProps) {
   //*define
+  const { isAuth } = useFirebaseAuth()
 
   //*useRef
 
@@ -27,7 +29,7 @@ function Main({ children }: MainProps) {
   return (
     <Box>
       <TopBar />
-      <Box>{children}</Box>
+      <Box>{isAuth ? children : null}</Box>
     </Box>
   )
 }
