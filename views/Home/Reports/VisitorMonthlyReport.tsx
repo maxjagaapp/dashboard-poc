@@ -30,6 +30,7 @@ import Paper from '@mui/material/Paper'
 
 //*hooks
 import { PropertyData, usePropertyGetAll } from 'hooks/property'
+import { propertyTypeArray, propertyStatusArray } from 'utils/constant'
 
 function VisitorMonthlyReport() {
   //*define
@@ -129,6 +130,18 @@ function VisitorMonthlyReport() {
     { field: 'city', headerName: 'City' },
     { field: 'state', headerName: 'State' },
     {
+      field: 'property_type',
+      headerName: 'Property Type',
+      type: 'singleSelect',
+      valueOptions: propertyTypeArray,
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      type: 'singleSelect',
+      valueOptions: propertyStatusArray,
+    },
+    {
       field: 'commencement_at',
       headerName: 'Commencement Date',
       minWidth: 150,
@@ -215,6 +228,12 @@ function VisitorMonthlyReport() {
           experimentalFeatures={{ aggregation: true }}
           components={{
             Toolbar: GridToolbar,
+          }}
+          componentsProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: { debounceMs: 500 },
+            },
           }}
         />
       </Box>

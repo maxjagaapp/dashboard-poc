@@ -31,6 +31,7 @@ import { green, blue, red, purple, orange, brown } from '@mui/material/colors'
 //*hooks
 import { usePropertyGetAll } from 'hooks/property'
 import { startCase } from 'lodash'
+import { propertyStatusArray } from 'utils/constant'
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
 
@@ -41,26 +42,26 @@ function PropertyTypePie() {
   const { data: propertyData, isLoading } = usePropertyGetAll()
 
   //*states
-  const [state, setState] = useState({
-    available: true,
-    terminated: true,
-    removed: true,
+  const [state, setState] = useState<{ [key: string]: boolean }>({
+    Available: true,
+    Terminated: true,
+    Removed: true,
   })
 
   //*const
-  const { available, terminated, removed } = state
+  const { Available, Terminated, Removed } = state
 
   //*useMemo
   const chartData = useMemo(() => {
     if (isLoading) return { labels: [], datasets: [] }
     const filteredPropertyData = filter(propertyData, ({ status }) => {
       switch (status) {
-        case 'terminated':
-          return terminated
-        case 'removed':
-          return removed
-        case undefined:
-          return available
+        case 'Terminated':
+          return Terminated
+        case 'Removed':
+          return Removed
+        case 'Available':
+          return Available
         default:
           return true
       }
@@ -93,7 +94,7 @@ function PropertyTypePie() {
         },
       ],
     }
-  }, [isLoading, propertyData, terminated, removed, available])
+  }, [isLoading, propertyData, Terminated, Removed, Available])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setState({
@@ -104,39 +105,24 @@ function PropertyTypePie() {
 
   return (
     <Box component={Paper} sx={{ p: 2 }}>
-      <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+      <FormControl component="fieldset" variant="standard">
         <FormLabel component="legend">Property Type</FormLabel>
         <FormGroup row>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={available}
-                onChange={handleChange}
-                name="available"
+          {propertyStatusArray.map((status) => {
+            return (
+              <FormControlLabel
+                key={status}
+                control={
+                  <Checkbox
+                    checked={state[status]}
+                    onChange={handleChange}
+                    name={status}
+                  />
+                }
+                label={status}
               />
-            }
-            label="Available"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={terminated}
-                onChange={handleChange}
-                name="terminated"
-              />
-            }
-            label="Terminated"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={removed}
-                onChange={handleChange}
-                name="removed"
-              />
-            }
-            label="Removed"
-          />
+            )
+          })}
         </FormGroup>
         <FormHelperText>Be careful</FormHelperText>
       </FormControl>

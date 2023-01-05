@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 import { useFirestoreQuery } from '@react-query-firebase/firestore'
 import { query, collection, DocumentData } from 'firebase/firestore'
-import { startCase } from 'lodash'
+import startCase from 'lodash/startCase'
 import { firestore } from 'config/firebase'
 
 export interface PropertyData {
   id: string
   name: string
-  propertyType: string
+  property_type: string
   first_address: string
   second_address: string
   city: string
@@ -24,7 +24,12 @@ export function usePropertyGetAll() {
       return queryData.data.docs.map((docSnapshot: DocumentData) => {
         return {
           ...docSnapshot.data(),
-          propertyType: startCase(docSnapshot.data().property_type),
+          property_type: docSnapshot.data().property_type
+            ? startCase(docSnapshot.data().property_type)
+            : 'None',
+          status: docSnapshot.data()?.status
+            ? startCase(docSnapshot.data().status)
+            : 'Available',
           id: docSnapshot.id,
         }
       })
