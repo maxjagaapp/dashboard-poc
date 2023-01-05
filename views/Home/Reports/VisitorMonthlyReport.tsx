@@ -17,36 +17,78 @@ import {
   useGridApiRef,
   useKeepGroupedColumnsHidden,
   GridColDef,
-  GridToolbar,
   GridValueGetterParams,
   GridValueFormatterParams,
+  GridToolbarContainer,
+  GridToolbarColumnsButton,
+  GridToolbarFilterButton,
+  GridToolbarExport,
+  GridToolbarDensitySelector,
+  GridApi,
 } from '@mui/x-data-grid-premium'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
+import Button from '@mui/material/Button'
 
 //*icons-material
 
 //*interfaces
 
 //*hooks
-import { PropertyData, usePropertyGetAll } from 'hooks/property'
-import { propertyTypeArray, propertyStatusArray } from 'utils/constant'
+import {
+  PropertyData,
+  usePropertyGetAll,
+  useGetAllPropertyLocationInArray,
+} from 'hooks/property'
+import {
+  propertyTypeArray,
+  propertyStatusArray,
+  monthInStringArray,
+  monthArrayObjectPair,
+} from 'utils/constant'
 
+const ISSERVER = typeof window === 'undefined'
 function VisitorMonthlyReport() {
   //*define
+  const visitorReportStateFilter = !ISSERVER
+    ? JSON.parse(localStorage.getItem('visitorReportStateFilter') as string)
+    : {}
+  const visitorReportStateColumnVisibilityModel = !ISSERVER
+    ? JSON.parse(
+        localStorage.getItem(
+          'visitorReportStateColumnVisibilityModel'
+        ) as string
+      )
+    : {}
+  const visitorReportStatePinnedColumns = !ISSERVER
+    ? JSON.parse(
+        localStorage.getItem('visitorReportStatePinnedColumns') as string
+      )
+    : {}
+  const visitorReportStateSortModel = !ISSERVER
+    ? JSON.parse(localStorage.getItem('visitorReportStateSortModel') as string)
+    : []
+
   const apiRef = useGridApiRef()
   const { data: propertyData, isLoading } = usePropertyGetAll()
+  const { propertyCityArray, propertyStateArray } =
+    useGetAllPropertyLocationInArray()
 
   //*states
   const initialState = useKeepGroupedColumnsHidden({
     apiRef,
     initialState: {
-      pinnedColumns: { left: ['name'] },
-      rowGrouping: {
-        model: ['month'],
+      columns: {
+        columnVisibilityModel: visitorReportStateColumnVisibilityModel,
       },
+      filter: visitorReportStateFilter,
+      pinnedColumns: visitorReportStatePinnedColumns || {
+        left: ['month', 'name'],
+      },
+      sorting: { sortModel: visitorReportStateSortModel },
       aggregation: {
         model: {
+          name: 'size',
           delivery_total: 'sum',
           pick_up_total: 'sum',
           drop_off_total: 'sum',
@@ -123,12 +165,27 @@ function VisitorMonthlyReport() {
     {
       field: 'month',
       headerName: 'Month',
+      type: 'singleSelect',
+      valueOptions: monthInStringArray,
+      valueGetter: (params) => {
+        return monthArrayObjectPair[params.value]
+      },
     },
     { field: 'name', headerName: 'Name', minWidth: 200 },
     { field: 'first_address', headerName: 'Address 1', minWidth: 200 },
     { field: 'second_address', headerName: 'Address 2', minWidth: 200 },
-    { field: 'city', headerName: 'City' },
-    { field: 'state', headerName: 'State' },
+    {
+      field: 'city',
+      headerName: 'City',
+      type: 'singleSelect',
+      valueOptions: propertyCityArray,
+    },
+    {
+      field: 'state',
+      headerName: 'State',
+      type: 'singleSelect',
+      valueOptions: propertyStateArray,
+    },
     {
       field: 'property_type',
       headerName: 'Property Type',
@@ -227,17 +284,51 @@ function VisitorMonthlyReport() {
           initialState={initialState}
           experimentalFeatures={{ aggregation: true }}
           components={{
-            Toolbar: GridToolbar,
+            Toolbar: CustomToolbar,
           }}
           componentsProps={{
             toolbar: {
               showQuickFilter: true,
               quickFilterProps: { debounceMs: 500 },
+              apiRef: apiRef.current,
             },
           }}
         />
       </Box>
     </Paper>
+  )
+}
+
+function CustomToolbar({ apiRef }: { apiRef: GridApi }) {
+  const handleSaveView = () => {
+    localStorage.setItem(
+      'visitorReportStateFilter',
+      JSON.stringify(apiRef.state.filter)
+    )
+    localStorage.setItem(
+      'visitorReportStateColumnVisibilityModel',
+      JSON.stringify(apiRef.state.columns.columnVisibilityModel)
+    )
+    localStorage.setItem(
+      'visitorReportStatePinnedColumns',
+      JSON.stringify(apiRef.state.pinnedColumns)
+    )
+    localStorage.setItem(
+      'visitorReportStateSortModel',
+      JSON.stringify(apiRef.state.sorting.sortModel)
+    )
+  }
+
+  return (
+    <GridToolbarContainer>
+      <GridToolbarColumnsButton />
+      <GridToolbarFilterButton />
+      <GridToolbarDensitySelector />
+      <GridToolbarExport />
+      <Button size="small" onClick={handleSaveView}>
+        Save View
+      </Button>
+    </GridToolbarContainer>
   )
 }
 
