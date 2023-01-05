@@ -17,6 +17,7 @@ export interface PropertyData {
   city: string
   state: string
   status: string
+  property_tag: string
 }
 
 export function usePropertyGetAll() {
@@ -38,6 +39,9 @@ export function usePropertyGetAll() {
             : 'Available',
           city: docSnapshot.data()?.city ? docSnapshot.data().city : 'None',
           state: docSnapshot.data()?.state ? docSnapshot.data().state : 'None',
+          property_tag: docSnapshot.data()?.property_tag
+            ? startCase(docSnapshot.data().property_tag)
+            : 'None',
           id: docSnapshot.id,
         }
       })

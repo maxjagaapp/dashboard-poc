@@ -24,6 +24,7 @@ import {
   GridToolbarFilterButton,
   GridToolbarExport,
   GridToolbarDensitySelector,
+  GridToolbarQuickFilter,
   GridApi,
 } from '@mui/x-data-grid-premium'
 import Box from '@mui/material/Box'
@@ -43,32 +44,20 @@ import {
 import {
   propertyTypeArray,
   propertyStatusArray,
-  monthInStringArray,
+  monthInNumberArray,
   monthArrayObjectPair,
+  propertyTagArray,
 } from 'utils/constant'
 
 const ISSERVER = typeof window === 'undefined'
 function VisitorMonthlyReport() {
   //*define
-  const visitorReportStateFilter = !ISSERVER
-    ? JSON.parse(localStorage.getItem('visitorReportStateFilter') as string)
-    : {}
-  const visitorReportStateColumnVisibilityModel = !ISSERVER
-    ? JSON.parse(
-        localStorage.getItem(
-          'visitorReportStateColumnVisibilityModel'
-        ) as string
-      )
-    : {}
-  const visitorReportStatePinnedColumns = !ISSERVER
-    ? JSON.parse(
-        localStorage.getItem('visitorReportStatePinnedColumns') as string
-      )
-    : {}
-  const visitorReportStateSortModel = !ISSERVER
-    ? JSON.parse(localStorage.getItem('visitorReportStateSortModel') as string)
-    : []
 
+  const visitorReportStateExportState = !ISSERVER
+    ? JSON.parse(
+        localStorage.getItem('visitorReportStateExportState') as string
+      )
+    : null
   const apiRef = useGridApiRef()
   const { data: propertyData, isLoading } = usePropertyGetAll()
   const { propertyCityArray, propertyStateArray } =
@@ -77,32 +66,29 @@ function VisitorMonthlyReport() {
   //*states
   const initialState = useKeepGroupedColumnsHidden({
     apiRef,
-    initialState: {
-      columns: {
-        columnVisibilityModel: visitorReportStateColumnVisibilityModel,
-      },
-      filter: visitorReportStateFilter,
-      pinnedColumns: visitorReportStatePinnedColumns || {
-        left: ['month', 'name'],
-      },
-      sorting: { sortModel: visitorReportStateSortModel },
-      aggregation: {
-        model: {
-          name: 'size',
-          delivery_total: 'sum',
-          pick_up_total: 'sum',
-          drop_off_total: 'sum',
-          visitor_total: 'sum',
-          overnight_total: 'sum',
-          contractor_total: 'sum',
-          worker_total: 'sum',
-          others_total: 'sum',
-          wrong_visitor_total: 'sum',
-          check_in_total: 'sum',
-          total_unit: 'sum',
+    initialState: visitorReportStateExportState
+      ? visitorReportStateExportState
+      : {
+          pinnedColumns: {
+            left: ['month', 'name'],
+          },
+          aggregation: {
+            model: {
+              name: 'size',
+              delivery_total: 'sum',
+              pick_up_total: 'sum',
+              drop_off_total: 'sum',
+              visitor_total: 'sum',
+              overnight_total: 'sum',
+              contractor_total: 'sum',
+              worker_total: 'sum',
+              others_total: 'sum',
+              wrong_visitor_total: 'sum',
+              check_in_total: 'sum',
+              total_unit: 'sum',
+            },
+          },
         },
-      },
-    },
   })
 
   //*useMemo
@@ -166,14 +152,27 @@ function VisitorMonthlyReport() {
       field: 'month',
       headerName: 'Month',
       type: 'singleSelect',
-      valueOptions: monthInStringArray,
-      valueGetter: (params) => {
+      valueOptions: monthInNumberArray,
+
+      valueFormatter: (params) => {
         return monthArrayObjectPair[params.value]
       },
     },
-    { field: 'name', headerName: 'Name', minWidth: 200 },
-    { field: 'first_address', headerName: 'Address 1', minWidth: 200 },
-    { field: 'second_address', headerName: 'Address 2', minWidth: 200 },
+    {
+      field: 'name',
+      headerName: 'Name',
+      minWidth: 200,
+    },
+    {
+      field: 'first_address',
+      headerName: 'Address 1',
+      minWidth: 200,
+    },
+    {
+      field: 'second_address',
+      headerName: 'Address 2',
+      minWidth: 200,
+    },
     {
       field: 'city',
       headerName: 'City',
@@ -191,6 +190,12 @@ function VisitorMonthlyReport() {
       headerName: 'Property Type',
       type: 'singleSelect',
       valueOptions: propertyTypeArray,
+    },
+    {
+      field: 'property_tag',
+      headerName: 'Property Tag',
+      type: 'singleSelect',
+      valueOptions: propertyTagArray,
     },
     {
       field: 'status',
@@ -302,32 +307,36 @@ function VisitorMonthlyReport() {
 function CustomToolbar({ apiRef }: { apiRef: GridApi }) {
   const handleSaveView = () => {
     localStorage.setItem(
-      'visitorReportStateFilter',
-      JSON.stringify(apiRef.state.filter)
-    )
-    localStorage.setItem(
-      'visitorReportStateColumnVisibilityModel',
-      JSON.stringify(apiRef.state.columns.columnVisibilityModel)
-    )
-    localStorage.setItem(
-      'visitorReportStatePinnedColumns',
-      JSON.stringify(apiRef.state.pinnedColumns)
-    )
-    localStorage.setItem(
-      'visitorReportStateSortModel',
-      JSON.stringify(apiRef.state.sorting.sortModel)
+      'visitorReportStateExportState',
+      JSON.stringify(apiRef.exportState())
     )
   }
 
   return (
     <GridToolbarContainer>
-      <GridToolbarColumnsButton />
-      <GridToolbarFilterButton />
-      <GridToolbarDensitySelector />
-      <GridToolbarExport />
-      <Button size="small" onClick={handleSaveView}>
-        Save View
-      </Button>
+      <Box sx={{ display: 'flex', width: '100%', pt: 1, pb: 1 }}>
+        <GridToolbarColumnsButton />
+        <GridToolbarFilterButton />
+        <GridToolbarDensitySelector />
+        <GridToolbarExport />
+        <Button size="small" onClick={handleSaveView}>
+          Save View
+        </Button>
+        <Button
+          size="small"
+          onClick={() => {
+            apiRef.restoreState({ filter: {} })
+            localStorage.removeItem('visitorReportStateExportState')
+            window.location.reload()
+          }}
+        >
+          Reset
+        </Button>
+        <Box sx={{ flex: '1 1 0%;' }} />
+        <Box>
+          <GridToolbarQuickFilter />
+        </Box>
+      </Box>
     </GridToolbarContainer>
   )
 }
