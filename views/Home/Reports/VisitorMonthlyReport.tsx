@@ -30,6 +30,7 @@ import {
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
+import Stack from '@mui/material/Stack'
 
 //*icons-material
 
@@ -314,7 +315,11 @@ function CustomToolbar({ apiRef }: { apiRef: GridApi }) {
 
   return (
     <GridToolbarContainer>
-      <Box sx={{ display: 'flex', width: '100%', pt: 1, pb: 1 }}>
+      <Stack
+        sx={{ display: 'flex', width: '100%', pt: 1, pb: 1 }}
+        direction="row"
+        spacing={1.5}
+      >
         <GridToolbarColumnsButton />
         <GridToolbarFilterButton />
         <GridToolbarDensitySelector />
@@ -325,7 +330,6 @@ function CustomToolbar({ apiRef }: { apiRef: GridApi }) {
         <Button
           size="small"
           onClick={() => {
-            apiRef.restoreState({ filter: {} })
             localStorage.removeItem('visitorReportStateExportState')
             window.location.reload()
           }}
@@ -336,7 +340,7 @@ function CustomToolbar({ apiRef }: { apiRef: GridApi }) {
         <Box>
           <GridToolbarQuickFilter />
         </Box>
-      </Box>
+      </Stack>
     </GridToolbarContainer>
   )
 }
