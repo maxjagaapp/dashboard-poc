@@ -30,6 +30,7 @@ import {
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
+import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 
 //*icons-material
@@ -276,6 +277,9 @@ function VisitorMonthlyReport() {
 
   return (
     <Paper sx={{ height: 'calc(100vh - 48px)', overflow: 'hidden', p: 1 }}>
+      <Typography variant="h3" gutterBottom>
+        Visitor Report
+      </Typography>
       <Box sx={{ height: '100%', width: '100%' }}>
         <DataGridPremium
           apiRef={apiRef}

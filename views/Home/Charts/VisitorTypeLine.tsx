@@ -22,6 +22,7 @@ import visitorDataHour from 'assets/visitor_count_hour.json'
 
 //*lodash
 import groupBy from 'lodash/groupBy'
+import filter from 'lodash/filter'
 import sumBy from 'lodash/sumBy'
 import forOwn from 'lodash/forOwn'
 import find from 'lodash/find'
@@ -31,6 +32,7 @@ import map from 'lodash/map'
 
 //material
 import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import Button from '@mui/material/Button'
@@ -168,8 +170,10 @@ function VisitorTypeLine() {
   //*define
 
   //*states
-  const [hourDate, setHourDate] = useState<Date>(new Date())
+  const [toHourDate, setToHourDate] = useState<Date>(new Date())
+  const [fromHourDate, setFromHourDate] = useState<Date>(new Date())
   const [chartDateFormat, setChartDateFormat] = useState<string>('day')
+  const [hourType, setHourType] = useState<string>('sum')
 
   //*const
 
@@ -177,22 +181,14 @@ function VisitorTypeLine() {
   const dateFormatSelection: ChartDateFormat[] = useMemo(
     () => [
       {
-        format: 'HH:00',
-        key: 'time',
-        label: 'Time',
-        unit: 'hour',
-        tooltipFormat: 'hh:00 a',
-        title: `Visitor Check-In Aug 2022 - Dec/2022`,
-      },
-      {
-        format: 'DD/MMM/YYYY HH:00',
+        format: hourType === 'sum' ? 'HH:00' : 'DD/MMM/YYYY HH:00',
         key: 'hour',
         label: 'Hour',
-        unit: 'hour',
-        tooltipFormat: 'hh:00 a',
-        title: `Visitor Check-In (${moment(hourDate).format(
+        unit: hourType === 'sum' ? 'hour' : 'day',
+        tooltipFormat: hourType === 'sum' ? 'hh:00 a' : 'DD/MMM/YYYY hh:00 a',
+        title: `Visitor Check-In (${moment(toHourDate).format(
           'ddd DD/MMM/YYYY'
-        )})`,
+        )}) to (${moment(fromHourDate).format('ddd DD/MMM/YYYY')})`,
       },
       {
         format: 'MM/DD/YYYY',
@@ -211,7 +207,7 @@ function VisitorTypeLine() {
         title: 'Visitor Check-In (Month)',
       },
     ],
-    [hourDate]
+    [toHourDate, fromHourDate, hourType]
   )
 
   const findSelectedChartFormat = useMemo(
@@ -223,20 +219,27 @@ function VisitorTypeLine() {
   )
 
   const data: ChartData<'line', number[], Date> = useMemo(() => {
+    const filteredVisitorData = filter(visitorData, (visitor) => {
+      switch (chartDateFormat) {
+        case 'hour':
+          return moment(new Date(visitor.check_in_date)).isBetween(
+            moment(new Date(toHourDate)),
+            moment(new Date(fromHourDate)),
+            'days',
+            '[]'
+          )
+
+        default:
+          return true
+      }
+    })
+
     const format = findSelectedChartFormat?.format
-    const groupData = groupBy(visitorData, (visit) =>
+    const groupData = groupBy(filteredVisitorData, (visit) =>
       moment(visit.check_in_date).format(format)
     )
     const resultData: VisitorData[] = []
     forOwn(groupData, (value, key) => {
-      if (
-        chartDateFormat === 'hour' &&
-        moment(key, format).format('MM/DD/YY') !==
-          moment(new Date(hourDate)).format('MM/DD/YY')
-      ) {
-        return
-      }
-
       resultData.push({
         check_in_date: moment(key, format).toDate(),
         delivery_total: sumBy(value, 'delivery_total'),
@@ -254,10 +257,18 @@ function VisitorTypeLine() {
       labels: map(resultData, 'check_in_date'),
       datasets: generateVisitorDatasets(resultData),
     }
-  }, [findSelectedChartFormat?.format, chartDateFormat, hourDate])
+  }, [
+    findSelectedChartFormat?.format,
+    chartDateFormat,
+    toHourDate,
+    fromHourDate,
+  ])
 
   return (
     <Box component={Paper} sx={{ p: 2 }}>
+      <Typography variant="h3" gutterBottom>
+        Total Visitor Report Line Chart
+      </Typography>
       <Stack spacing={2} direction="row">
         <ButtonGroup size="small">
           {dateFormatSelection.map((date) => (
@@ -272,21 +283,53 @@ function VisitorTypeLine() {
             </Button>
           ))}
         </ButtonGroup>
+        <ButtonGroup size="small">
+          <Button
+            variant={hourType === 'sum' ? 'contained' : 'outlined'}
+            key={'sum'}
+            onClick={() => {
+              setHourType('sum')
+            }}
+          >
+            Sum
+          </Button>
+          <Button
+            variant={hourType === 'spread' ? 'contained' : 'outlined'}
+            key={'spread'}
+            onClick={() => {
+              setHourType('spread')
+            }}
+          >
+            Spread
+          </Button>
+        </ButtonGroup>
         {chartDateFormat === 'hour' && (
-          <Box>
+          <Stack direction="row" spacing={2}>
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DatePicker
-                label="Basic example"
-                value={hourDate}
+                label="From"
+                value={toHourDate}
                 onChange={(newValue) => {
-                  if (newValue) setHourDate(newValue)
+                  if (newValue) setToHourDate(newValue)
                 }}
                 renderInput={(params) => (
                   <TextField {...params} fullWidth={false} size="small" />
                 )}
               />
             </LocalizationProvider>
-          </Box>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DatePicker
+                label="To"
+                value={fromHourDate}
+                onChange={(newValue) => {
+                  if (newValue) setFromHourDate(newValue)
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} fullWidth={false} size="small" />
+                )}
+              />
+            </LocalizationProvider>
+          </Stack>
         )}
       </Stack>
       <Box>
@@ -314,7 +357,7 @@ function VisitorTypeLine() {
               if (elements.length > 0) {
                 if (chartDateFormat === 'day') {
                   if (data.labels?.[elements[0]?.index]) {
-                    setHourDate(data.labels?.[elements[0]?.index])
+                    setToHourDate(data.labels?.[elements[0]?.index])
                     setChartDateFormat('hour')
                   }
                 }

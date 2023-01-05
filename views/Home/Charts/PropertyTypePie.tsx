@@ -21,6 +21,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
+import Typography from '@mui/material/Typography'
 import { green, blue, red, purple, orange, brown } from '@mui/material/colors'
 
 //icons-material
@@ -104,6 +105,9 @@ function PropertyTypePie() {
 
   return (
     <Box component={Paper} sx={{ p: 2 }}>
+      <Typography variant="h3" gutterBottom>
+        Property Type Pie Chart
+      </Typography>
       <FormControl component="fieldset" variant="standard">
         <FormLabel component="legend">Property Type</FormLabel>
         <FormGroup row>
