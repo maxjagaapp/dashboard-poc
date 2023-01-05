@@ -124,7 +124,6 @@ function PropertyTypePie() {
             )
           })}
         </FormGroup>
-        <FormHelperText>Be careful</FormHelperText>
       </FormControl>
       <Pie
         height={200}
