@@ -17,7 +17,7 @@ import 'chartjs-adapter-moment'
 import moment, { Moment } from 'moment'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 
-//assets
+//*assets
 import visitorDataHour from 'assets/visitor_count_hour.json'
 
 //*lodash
@@ -30,14 +30,13 @@ import map from 'lodash/map'
 
 //*components
 
-//material
+//*material
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
-import Paper from '@mui/material/Paper'
 import {
   pink,
   green,
@@ -54,10 +53,12 @@ import {
   DateRangePicker,
   DateRange,
 } from '@mui/x-date-pickers-pro/DateRangePicker'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 
-//icons-material
+//*icons-material
 
-//interfaces
+//*interfaces
 interface VisitorData {
   check_in_date: Date
   delivery_total: number
@@ -92,7 +93,7 @@ ChartJS.register(
   ChartDataLabels
 )
 
-//consts
+//*consts
 const generateVisitorDatasets = (data: VisitorData[]) => {
   return [
     {
@@ -265,106 +266,110 @@ function VisitorTypeLine() {
   }, [findSelectedChartFormat?.format, chartDateFormat, hourRangeDate])
 
   return (
-    <Box component={Paper} sx={{ p: 2 }}>
-      <Typography variant="h3" gutterBottom>
-        Total Visitor Report Line Chart
-      </Typography>
-      <Stack spacing={2} direction="row">
-        <ButtonGroup size="small">
-          {dateFormatSelection.map((date) => (
-            <Button
-              variant={chartDateFormat === date.key ? 'contained' : 'outlined'}
-              key={date.key}
-              onClick={() => {
-                setChartDateFormat(date.key)
-              }}
-            >
-              {date.label}
-            </Button>
-          ))}
-        </ButtonGroup>
-        <ButtonGroup size="small">
+    <Card>
+      <CardContent>
+        <Typography variant="h3" gutterBottom>
+          Total Visitor Report Line Chart
+        </Typography>
+        <Stack spacing={2} direction="row">
+          <ButtonGroup size="small">
+            {dateFormatSelection.map((date) => (
+              <Button
+                variant={
+                  chartDateFormat === date.key ? 'contained' : 'outlined'
+                }
+                key={date.key}
+                onClick={() => {
+                  setChartDateFormat(date.key)
+                }}
+              >
+                {date.label}
+              </Button>
+            ))}
+          </ButtonGroup>
+          <ButtonGroup size="small">
+            {chartDateFormat === 'hour' && (
+              <>
+                <Button
+                  variant={hourType === 'sum' ? 'contained' : 'outlined'}
+                  key={'sum'}
+                  onClick={() => {
+                    setHourType('sum')
+                  }}
+                >
+                  Sum
+                </Button>
+                <Button
+                  variant={hourType === 'spread' ? 'contained' : 'outlined'}
+                  key={'spread'}
+                  onClick={() => {
+                    setHourType('spread')
+                  }}
+                >
+                  Spread
+                </Button>
+              </>
+            )}
+          </ButtonGroup>
           {chartDateFormat === 'hour' && (
-            <>
-              <Button
-                variant={hourType === 'sum' ? 'contained' : 'outlined'}
-                key={'sum'}
-                onClick={() => {
-                  setHourType('sum')
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DateRangePicker
+                value={hourRangeDate}
+                onChange={(newValue) => {
+                  setHourRangeDate(newValue)
                 }}
-              >
-                Sum
-              </Button>
-              <Button
-                variant={hourType === 'spread' ? 'contained' : 'outlined'}
-                key={'spread'}
-                onClick={() => {
-                  setHourType('spread')
-                }}
-              >
-                Spread
-              </Button>
-            </>
+                renderInput={(startProps, endProps) => (
+                  <>
+                    <TextField size="small" {...startProps} />
+                    <Box sx={{ mx: 2 }}> to </Box>
+                    <TextField size="small" {...endProps} />
+                  </>
+                )}
+              />
+            </LocalizationProvider>
           )}
-        </ButtonGroup>
-        {chartDateFormat === 'hour' && (
-          <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DateRangePicker
-              value={hourRangeDate}
-              onChange={(newValue) => {
-                setHourRangeDate(newValue)
-              }}
-              renderInput={(startProps, endProps) => (
-                <>
-                  <TextField size="small" {...startProps} />
-                  <Box sx={{ mx: 2 }}> to </Box>
-                  <TextField size="small" {...endProps} />
-                </>
-              )}
-            />
-          </LocalizationProvider>
-        )}
-      </Stack>
-      <Box>
-        <Line
-          height={450}
-          data={data}
-          options={{
-            elements: { line: { tension: 0.4 } },
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-              mode: 'index',
-              intersect: false,
-            },
-            plugins: {
-              title: {
-                display: true,
-                text: findSelectedChartFormat?.title,
+        </Stack>
+        <Box>
+          <Line
+            height={450}
+            data={data}
+            options={{
+              elements: { line: { tension: 0.4 } },
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: {
+                mode: 'index',
+                intersect: false,
               },
-              datalabels: {
-                display: false,
-              },
-            },
-            scales: {
-              x: {
-                type: 'time',
-                display: true,
-                time: {
-                  unit: findSelectedChartFormat?.unit,
-                  tooltipFormat: findSelectedChartFormat?.tooltipFormat,
+              plugins: {
+                title: {
+                  display: true,
+                  text: findSelectedChartFormat?.title,
+                },
+                datalabels: {
+                  display: false,
                 },
               },
-              y: {
-                type: 'linear',
-                display: true,
-                position: 'left',
+              scales: {
+                x: {
+                  type: 'time',
+                  display: true,
+                  time: {
+                    unit: findSelectedChartFormat?.unit,
+                    tooltipFormat: findSelectedChartFormat?.tooltipFormat,
+                  },
+                },
+                y: {
+                  type: 'linear',
+                  display: true,
+                  position: 'left',
+                },
               },
-            },
-          }}
-        />
-      </Box>
-    </Box>
+            }}
+          />
+        </Box>
+      </CardContent>
+    </Card>
   )
 }
 

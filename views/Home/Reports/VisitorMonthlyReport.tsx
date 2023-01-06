@@ -2,7 +2,7 @@
 import { useMemo } from 'react'
 import moment from 'moment'
 
-//assets
+//*assets
 import visitorPropertyMonth from 'assets/visitor_count_property_month.json'
 
 //*lodash
@@ -28,10 +28,11 @@ import {
   GridApi,
 } from '@mui/x-data-grid-premium'
 import Box from '@mui/material/Box'
-import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 
 //*icons-material
 
@@ -276,36 +277,40 @@ function VisitorMonthlyReport() {
   ]
 
   return (
-    <Paper sx={{ height: 'calc(100vh - 48px)', overflow: 'hidden', p: 1 }}>
-      <Typography variant="h3" gutterBottom>
-        Visitor Report
-      </Typography>
-      <Box sx={{ height: '100%', width: '100%' }}>
-        <DataGridPremium
-          apiRef={apiRef}
-          density="compact"
-          rowGroupingColumnMode="multiple"
-          getRowId={(data) => {
-            return data.index
-          }}
-          rows={visitorData}
-          columns={columns}
-          disableSelectionOnClick
-          initialState={initialState}
-          experimentalFeatures={{ aggregation: true }}
-          components={{
-            Toolbar: CustomToolbar,
-          }}
-          componentsProps={{
-            toolbar: {
-              showQuickFilter: true,
-              quickFilterProps: { debounceMs: 500 },
-              apiRef: apiRef.current,
-            },
-          }}
-        />
-      </Box>
-    </Paper>
+    <Card>
+      <CardContent>
+        <Box sx={{ height: 'calc(100vh - 48px)', overflow: 'hidden' }}>
+          <Typography variant="h3" gutterBottom>
+            Visitor Report
+          </Typography>
+          <Box sx={{ height: '100%', width: '100%' }}>
+            <DataGridPremium
+              apiRef={apiRef}
+              density="compact"
+              rowGroupingColumnMode="multiple"
+              getRowId={(data) => {
+                return data.index
+              }}
+              rows={visitorData}
+              columns={columns}
+              disableSelectionOnClick
+              initialState={initialState}
+              experimentalFeatures={{ aggregation: true }}
+              components={{
+                Toolbar: CustomToolbar,
+              }}
+              componentsProps={{
+                toolbar: {
+                  showQuickFilter: true,
+                  quickFilterProps: { debounceMs: 500 },
+                  apiRef: apiRef.current,
+                },
+              }}
+            />
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
   )
 }
 

@@ -12,11 +12,11 @@ import createEmotionCache from 'config/createEmotionCache'
 import { isIsoDate } from 'helpers/dateHelpers'
 import 'config/firebase'
 
-//layout
+//*layout
 import Main from 'layout/Main'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-//components
+//*components
 import LoginDialog from 'components/LoginDialog'
 
 const clientSideEmotionCache = createEmotionCache()

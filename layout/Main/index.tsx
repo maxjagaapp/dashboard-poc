@@ -3,13 +3,13 @@
 //*components
 import TopBar from './TopBar'
 
-//material
+//*material
 import Box from '@mui/material/Box'
 import { useFirebaseAuth } from 'hooks/auth'
 
-//icons-material
+//*icons-material
 
-//interfaces
+//*interfaces
 interface MainProps {
   children: JSX.Element
 }

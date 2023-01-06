@@ -1,4 +1,4 @@
-//assets
+//*assets
 
 //*lodash
 
@@ -7,15 +7,15 @@ import PropertyTypePie from './Charts/PropertyTypePie'
 import VisitorTypeLine from './Charts/VisitorTypeLine'
 import VisitorMonthlyReport from './Reports/VisitorMonthlyReport'
 
-//material
+//*material
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
 
-//icons-material
+//*icons-material
 
-//interfaces
+//*interfaces
 
-//consts
+//*consts
 
 function Home() {
   //*define

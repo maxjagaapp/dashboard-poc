@@ -2,15 +2,15 @@
 
 //*components
 
-//material
+//*material
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import IconButton from '@mui/material/IconButton'
 
-//icons-material
+//*icons-material
 import MenuIcon from '@mui/icons-material/Menu'
 
-//interfaces
+//*interfaces
 
 function TopBar() {
   //*define

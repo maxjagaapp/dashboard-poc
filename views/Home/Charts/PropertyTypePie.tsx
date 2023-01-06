@@ -3,7 +3,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Pie } from 'react-chartjs-2'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 
-//assets
+//*assets
 
 //*lodash
 import countBy from 'lodash/countBy'
@@ -13,20 +13,20 @@ import filter from 'lodash/filter'
 
 //*components
 
-//material
+//*material
 import FormLabel from '@mui/material/FormLabel'
 import FormControl from '@mui/material/FormControl'
 import FormGroup from '@mui/material/FormGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
-import Box from '@mui/material/Box'
-import Paper from '@mui/material/Paper'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import { green, blue, red, purple, orange, brown } from '@mui/material/colors'
 
-//icons-material
+//*icons-material
 
-//interfaces
+//*interfaces
 
 //*hooks
 import { usePropertyGetAll } from 'hooks/property'
@@ -35,7 +35,7 @@ import { propertyStatusArray } from 'utils/constant'
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
 
-//consts
+//*consts
 
 function PropertyTypePie() {
   //*define
@@ -104,52 +104,54 @@ function PropertyTypePie() {
   }
 
   return (
-    <Box component={Paper} sx={{ p: 2 }}>
-      <Typography variant="h3" gutterBottom>
-        Property Type Pie Chart
-      </Typography>
-      <FormControl component="fieldset" variant="standard">
-        <FormLabel component="legend">Property Type</FormLabel>
-        <FormGroup row>
-          {propertyStatusArray.map((status) => {
-            return (
-              <FormControlLabel
-                key={status}
-                control={
-                  <Checkbox
-                    checked={state[status]}
-                    onChange={handleChange}
-                    name={status}
-                  />
-                }
-                label={status}
-              />
-            )
-          })}
-        </FormGroup>
-      </FormControl>
-      <Pie
-        height={200}
-        width={200}
-        data={chartData}
-        options={{
-          responsive: true,
-          plugins: {
-            datalabels: {
-              color: 'white',
-              font: {
-                weight: 'bold',
+    <Card>
+      <CardContent>
+        <Typography variant="h3" gutterBottom>
+          Property Type Pie Chart
+        </Typography>
+        <FormControl component="fieldset" variant="standard">
+          <FormLabel component="legend">Property Type</FormLabel>
+          <FormGroup row>
+            {propertyStatusArray.map((status) => {
+              return (
+                <FormControlLabel
+                  key={status}
+                  control={
+                    <Checkbox
+                      checked={state[status]}
+                      onChange={handleChange}
+                      name={status}
+                    />
+                  }
+                  label={status}
+                />
+              )
+            })}
+          </FormGroup>
+        </FormControl>
+        <Pie
+          height={200}
+          width={200}
+          data={chartData}
+          options={{
+            responsive: true,
+            plugins: {
+              datalabels: {
+                color: 'white',
+                font: {
+                  weight: 'bold',
+                },
+                formatter: Math.round,
               },
-              formatter: Math.round,
+              title: {
+                display: true,
+                text: 'Property By Type',
+              },
             },
-            title: {
-              display: true,
-              text: 'Property By Type',
-            },
-          },
-        }}
-      />
-    </Box>
+          }}
+        />
+      </CardContent>
+    </Card>
   )
 }
 
