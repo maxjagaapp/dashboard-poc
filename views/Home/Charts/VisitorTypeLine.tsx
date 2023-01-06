@@ -14,7 +14,7 @@ import {
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import 'chartjs-adapter-moment'
-import moment from 'moment'
+import moment, { Moment } from 'moment'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 
 //assets
@@ -48,9 +48,12 @@ import {
   yellow,
   brown,
 } from '@mui/material/colors'
+import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import {
+  DateRangePicker,
+  DateRange,
+} from '@mui/x-date-pickers-pro/DateRangePicker'
 
 //icons-material
 
@@ -170,10 +173,12 @@ function VisitorTypeLine() {
   //*define
 
   //*states
-  const [toHourDate, setToHourDate] = useState<Date>(new Date())
-  const [fromHourDate, setFromHourDate] = useState<Date>(new Date())
   const [chartDateFormat, setChartDateFormat] = useState<string>('day')
   const [hourType, setHourType] = useState<string>('sum')
+  const [hourRangeDate, setHourRangeDate] = useState<DateRange<Moment>>([
+    null,
+    null,
+  ])
 
   //*const
 
@@ -186,9 +191,9 @@ function VisitorTypeLine() {
         label: 'Hour',
         unit: hourType === 'sum' ? 'hour' : 'day',
         tooltipFormat: hourType === 'sum' ? 'hh:00 a' : 'DD/MMM/YYYY hh:00 a',
-        title: `Visitor Check-In (${moment(toHourDate).format(
+        title: `Visitor Check-In (${hourRangeDate[0]?.format(
           'ddd DD/MMM/YYYY'
-        )}) to (${moment(fromHourDate).format('ddd DD/MMM/YYYY')})`,
+        )}) to (${hourRangeDate[1]?.format('ddd DD/MMM/YYYY')})`,
       },
       {
         format: 'MM/DD/YYYY',
@@ -207,7 +212,7 @@ function VisitorTypeLine() {
         title: 'Visitor Check-In (Month)',
       },
     ],
-    [toHourDate, fromHourDate, hourType]
+    [hourRangeDate, hourType]
   )
 
   const findSelectedChartFormat = useMemo(
@@ -223,8 +228,8 @@ function VisitorTypeLine() {
       switch (chartDateFormat) {
         case 'hour':
           return moment(new Date(visitor.check_in_date)).isBetween(
-            moment(new Date(toHourDate)),
-            moment(new Date(fromHourDate)),
+            hourRangeDate[0],
+            hourRangeDate[1],
             'days',
             '[]'
           )
@@ -257,12 +262,7 @@ function VisitorTypeLine() {
       labels: map(resultData, 'check_in_date'),
       datasets: generateVisitorDatasets(resultData),
     }
-  }, [
-    findSelectedChartFormat?.format,
-    chartDateFormat,
-    toHourDate,
-    fromHourDate,
-  ])
+  }, [findSelectedChartFormat?.format, chartDateFormat, hourRangeDate])
 
   return (
     <Box component={Paper} sx={{ p: 2 }}>
@@ -284,52 +284,45 @@ function VisitorTypeLine() {
           ))}
         </ButtonGroup>
         <ButtonGroup size="small">
-          <Button
-            variant={hourType === 'sum' ? 'contained' : 'outlined'}
-            key={'sum'}
-            onClick={() => {
-              setHourType('sum')
-            }}
-          >
-            Sum
-          </Button>
-          <Button
-            variant={hourType === 'spread' ? 'contained' : 'outlined'}
-            key={'spread'}
-            onClick={() => {
-              setHourType('spread')
-            }}
-          >
-            Spread
-          </Button>
+          {chartDateFormat === 'hour' && (
+            <>
+              <Button
+                variant={hourType === 'sum' ? 'contained' : 'outlined'}
+                key={'sum'}
+                onClick={() => {
+                  setHourType('sum')
+                }}
+              >
+                Sum
+              </Button>
+              <Button
+                variant={hourType === 'spread' ? 'contained' : 'outlined'}
+                key={'spread'}
+                onClick={() => {
+                  setHourType('spread')
+                }}
+              >
+                Spread
+              </Button>
+            </>
+          )}
         </ButtonGroup>
         {chartDateFormat === 'hour' && (
-          <Stack direction="row" spacing={2}>
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-              <DatePicker
-                label="From"
-                value={toHourDate}
-                onChange={(newValue) => {
-                  if (newValue) setToHourDate(newValue)
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} fullWidth={false} size="small" />
-                )}
-              />
-            </LocalizationProvider>
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-              <DatePicker
-                label="To"
-                value={fromHourDate}
-                onChange={(newValue) => {
-                  if (newValue) setFromHourDate(newValue)
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} fullWidth={false} size="small" />
-                )}
-              />
-            </LocalizationProvider>
-          </Stack>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <DateRangePicker
+              value={hourRangeDate}
+              onChange={(newValue) => {
+                setHourRangeDate(newValue)
+              }}
+              renderInput={(startProps, endProps) => (
+                <>
+                  <TextField size="small" {...startProps} />
+                  <Box sx={{ mx: 2 }}> to </Box>
+                  <TextField size="small" {...endProps} />
+                </>
+              )}
+            />
+          </LocalizationProvider>
         )}
       </Stack>
       <Box>
@@ -352,16 +345,6 @@ function VisitorTypeLine() {
               datalabels: {
                 display: false,
               },
-            },
-            onClick: (event, elements) => {
-              if (elements.length > 0) {
-                if (chartDateFormat === 'day') {
-                  if (data.labels?.[elements[0]?.index]) {
-                    setToHourDate(data.labels?.[elements[0]?.index])
-                    setChartDateFormat('hour')
-                  }
-                }
-              }
             },
             scales: {
               x: {

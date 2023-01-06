@@ -17,6 +17,7 @@
     "@mui/material": "latest",
     "@mui/x-data-grid-premium": "^5.17.17",
     "@mui/x-date-pickers": "^5.0.12",
+    "@mui/x-date-pickers-pro": "^5.0.13",
     "@react-query-firebase/auth": "^1.0.0-dev.2",
     "@react-query-firebase/firestore": "^1.0.0-dev.7",
     "@tanstack/react-table": "^8.7.4",
