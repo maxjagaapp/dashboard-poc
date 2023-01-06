@@ -29,10 +29,10 @@ function Home() {
   return (
     <Box sx={{ p: 2 }}>
       <Grid container spacing={2}>
-        <Grid xs={9}>
+        <Grid xs={12} md={12} lg xl>
           <VisitorTypeLine />
         </Grid>
-        <Grid xs={3}>
+        <Grid xs={12} md={6} lg={3} xl={2}>
           <PropertyTypePie />
         </Grid>
         <Grid xs={12}>

@@ -130,8 +130,6 @@ function PropertyTypePie() {
           </FormGroup>
         </FormControl>
         <Pie
-          height={200}
-          width={200}
           data={chartData}
           options={{
             responsive: true,
