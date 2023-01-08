@@ -3,8 +3,8 @@
 //*lodash
 
 //*components
-import PropertyTypePie from './Charts/PropertyTypePie'
-import PropertyUnitPie from './Charts/PropertyUnitPie'
+import VisitorTypeLine from './Charts/VisitorTypeLine'
+import VisitorMonthlyReport from './Reports/VisitorMonthlyReport'
 
 //*material
 import Box from '@mui/material/Box'
@@ -17,7 +17,7 @@ import Grid from '@mui/material/Unstable_Grid2'
 
 //*consts
 
-function Home() {
+function Visitor() {
   //*define
 
   //*states
@@ -30,11 +30,11 @@ function Home() {
     <Container maxWidth="x3l" disableGutters>
       <Box sx={{ p: 2 }}>
         <Grid container spacing={2}>
-          <Grid xs={6} sm={12} md={6} lg={4} xl={3} x2l={2.4}>
-            <PropertyTypePie />
+          <Grid xs={12}>
+            <VisitorTypeLine />
           </Grid>
-          <Grid xs={6} sm={12} md={6} lg={4} xl={3} x2l={2.4}>
-            <PropertyUnitPie />
+          <Grid xs={12}>
+            <VisitorMonthlyReport />
           </Grid>
         </Grid>
       </Box>
@@ -42,4 +42,4 @@ function Home() {
   )
 }
 
-export default Home
+export default Visitor

@@ -1,7 +1,8 @@
 /* eslint-disable import/no-anonymous-default-export */
+import { TypographyOptions } from '@mui/material/styles/createTypography'
 import palette from './palette'
 
-export default {
+const typography: TypographyOptions = {
   fontFamily: [
     'Gotham Rounded',
     'Gotham Rounded Book',
@@ -95,3 +96,5 @@ export default {
     textTransform: 'uppercase',
   },
 }
+
+export default typography

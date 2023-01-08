@@ -18,6 +18,7 @@ export interface PropertyData {
   state: string
   status: string
   property_tag: string
+  total_unit: number
 }
 
 export function usePropertyGetAll() {

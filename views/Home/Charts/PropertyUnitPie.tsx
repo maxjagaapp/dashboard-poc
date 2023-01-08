@@ -30,14 +30,13 @@ import { green, blue, red, purple, orange, brown } from '@mui/material/colors'
 
 //*hooks
 import { usePropertyGetAll } from 'hooks/property'
-import { startCase } from 'lodash'
 import { propertyStatusArray } from 'utils/constant'
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
 
 //*consts
 
-function PropertyTypePie() {
+function PropertyUnitPie() {
   //*define
   const { data: propertyData, isLoading } = usePropertyGetAll()
 
@@ -66,10 +65,22 @@ function PropertyTypePie() {
           return true
       }
     })
-    const propertyCountsByType = countBy(filteredPropertyData, 'property_type')
+
+    const propertyCountsMap = map(filteredPropertyData, (data) => {
+      let labelRange
+
+      if (data.total_unit <= 50) labelRange = '<= 50'
+      else if (data.total_unit <= 150) labelRange = '<= 150'
+      else if (data.total_unit <= 500) labelRange = '<= 500'
+      else if (data.total_unit <= 1000) labelRange = '<= 1000'
+      else labelRange = '> 1000'
+
+      return { ...data, labelRange }
+    })
+    const propertyCountsByType = countBy(propertyCountsMap, 'labelRange')
 
     return {
-      labels: keys(propertyCountsByType).map((type) => startCase(type)),
+      labels: keys(propertyCountsByType).map((type) => type),
       datasets: [
         {
           label: 'Property Count',
@@ -107,7 +118,7 @@ function PropertyTypePie() {
     <Card>
       <CardContent>
         <Typography variant="h3" gutterBottom>
-          Property Type Pie Chart
+          Property Units Range
         </Typography>
         <FormControl component="fieldset" variant="standard">
           <FormLabel component="legend">Property Status</FormLabel>
@@ -152,4 +163,4 @@ function PropertyTypePie() {
   )
 }
 
-export default PropertyTypePie
+export default PropertyUnitPie
