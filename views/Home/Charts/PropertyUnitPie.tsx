@@ -70,10 +70,11 @@ function PropertyUnitPie() {
       let labelRange
 
       if (data.total_unit <= 50) labelRange = '<= 50'
-      else if (data.total_unit <= 150) labelRange = '<= 150'
-      else if (data.total_unit <= 500) labelRange = '<= 500'
-      else if (data.total_unit <= 1000) labelRange = '<= 1000'
-      else labelRange = '> 1000'
+      else if (data.total_unit <= 150) labelRange = '50 > x <= 150'
+      else if (data.total_unit <= 500) labelRange = '150 > x <= 500'
+      else if (data.total_unit <= 1000) labelRange = '500 > x <= 1000'
+      else if (data.total_unit <= 2000) labelRange = '1000 > x <= 2000'
+      else labelRange = '> 2000'
 
       return { ...data, labelRange }
     })
