@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo } from 'react'
+import { useMemo, useCallback, useState } from 'react'
 import moment from 'moment'
 
 //*assets
@@ -8,6 +8,8 @@ import visitorPropertyMonth from 'assets/visitor_count_property_month.json'
 //*lodash
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
+import maxBy from 'lodash/maxBy'
+import includes from 'lodash/includes'
 
 //*components
 
@@ -26,6 +28,7 @@ import {
   GridToolbarDensitySelector,
   GridToolbarQuickFilter,
   GridApi,
+  gridFilteredSortedRowEntriesSelector,
 } from '@mui/x-data-grid-premium'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -33,6 +36,9 @@ import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import FormGroup from '@mui/material/FormGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 
 //*icons-material
 
@@ -55,7 +61,6 @@ import {
 const ISSERVER = typeof window === 'undefined'
 function VisitorMonthlyReport() {
   //*define
-
   const visitorReportStateExportState = !ISSERVER
     ? JSON.parse(
         localStorage.getItem('visitorReportStateExportState') as string
@@ -67,6 +72,8 @@ function VisitorMonthlyReport() {
     useGetAllPropertyLocationInArray()
 
   //*states
+  const [toggleNumberColorGradient, setToggleNumberColorGradient] =
+    useState(false)
   const initialState = useKeepGroupedColumnsHidden({
     apiRef,
     initialState: visitorReportStateExportState
@@ -276,6 +283,24 @@ function VisitorMonthlyReport() {
     },
   ]
 
+  const getColorNumber = useCallback(
+    (value: number, field: string, fieldIncluded: string[]) => {
+      if (includes(fieldIncluded, field)) {
+        const total = maxBy(
+          gridFilteredSortedRowEntriesSelector(apiRef),
+          `model.${field}`
+        )?.model[field]
+        if (value < total * 0.2) return 'bluered1'
+        if (value < total * 0.4) return 'bluered2'
+        if (value < total * 0.6) return 'bluered3'
+        if (value < total * 0.7) return 'bluered4'
+        if (value <= total * 1) return 'bluered5'
+      }
+      return ''
+    },
+    [apiRef]
+  )
+
   return (
     <Card>
       <CardContent>
@@ -283,7 +308,32 @@ function VisitorMonthlyReport() {
           <Typography variant="h3" gutterBottom>
             Visitor Report
           </Typography>
-          <Box sx={{ height: '100%', width: '100%' }}>
+          <Box
+            sx={{
+              height: '100%',
+              width: '100%',
+              '& .bluered1': {
+                color: 'white',
+                backgroundColor: '#00B7FF',
+              },
+              '& .bluered2': {
+                color: 'white',
+                backgroundColor: '#4089BF',
+              },
+              '& .bluered3': {
+                color: 'white',
+                backgroundColor: '#805C80',
+              },
+              '& .bluered4': {
+                color: 'white',
+                backgroundColor: '#BF2E40',
+              },
+              '& .bluered5': {
+                color: 'white',
+                backgroundColor: '#FF0000',
+              },
+            }}
+          >
             <DataGridPremium
               apiRef={apiRef}
               density="compact"
@@ -304,7 +354,25 @@ function VisitorMonthlyReport() {
                   showQuickFilter: true,
                   quickFilterProps: { debounceMs: 500 },
                   apiRef: apiRef.current,
+                  toggleNumberColorGradient,
+                  setToggleNumberColorGradient,
                 },
+              }}
+              getCellClassName={(param) => {
+                if (!toggleNumberColorGradient) return ''
+                return getColorNumber(param.value, param.field, [
+                  'delivery_total',
+                  'pick_up_total',
+                  'drop_off_total',
+                  'visitor_total',
+                  'overnight_total',
+                  'contractor_total',
+                  'worker_total',
+                  'others_total',
+                  'wrong_visitor_total',
+                  'check_in_total',
+                  'total_unit',
+                ])
               }}
             />
           </Box>
@@ -314,18 +382,33 @@ function VisitorMonthlyReport() {
   )
 }
 
-function CustomToolbar({ apiRef }: { apiRef: GridApi }) {
+function CustomToolbar({
+  apiRef,
+  toggleNumberColorGradient,
+  setToggleNumberColorGradient,
+}: {
+  apiRef: GridApi
+  toggleNumberColorGradient: boolean
+  setToggleNumberColorGradient: (toggle: boolean) => void
+}) {
   const handleSaveView = () => {
-    localStorage.setItem(
-      'visitorReportStateExportState',
-      JSON.stringify(apiRef.exportState())
-    )
+    if (apiRef.exportState())
+      localStorage.setItem(
+        'visitorReportStateExportState',
+        JSON.stringify(apiRef.exportState())
+      )
   }
 
   return (
     <GridToolbarContainer>
       <Stack
-        sx={{ display: 'flex', width: '100%', pt: 1, pb: 1 }}
+        sx={{
+          display: 'flex',
+          width: '100%',
+          pt: 1,
+          pb: 1,
+          alignItems: 'center',
+        }}
         direction="row"
         spacing={1.5}
       >
@@ -345,6 +428,20 @@ function CustomToolbar({ apiRef }: { apiRef: GridApi }) {
         >
           Reset
         </Button>
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Switch
+                size="small"
+                checked={toggleNumberColorGradient}
+                onClick={() =>
+                  setToggleNumberColorGradient(!toggleNumberColorGradient)
+                }
+              />
+            }
+            label="Toggle Color"
+          />
+        </FormGroup>
         <Box sx={{ flex: '1 1 0%;' }} />
         <Box>
           <GridToolbarQuickFilter />
