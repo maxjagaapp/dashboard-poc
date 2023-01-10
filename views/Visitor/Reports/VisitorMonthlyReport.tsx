@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useCallback, useState } from 'react'
+import { useMemo, useCallback } from 'react'
 import moment from 'moment'
 
 //*assets
@@ -10,6 +10,8 @@ import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import maxBy from 'lodash/maxBy'
 import includes from 'lodash/includes'
+import replace from 'lodash/replace'
+import startCase from 'lodash/startCase'
 
 //*components
 
@@ -36,9 +38,6 @@ import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import FormGroup from '@mui/material/FormGroup'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Switch from '@mui/material/Switch'
 
 //*icons-material
 
@@ -72,8 +71,6 @@ function VisitorMonthlyReport() {
     useGetAllPropertyLocationInArray()
 
   //*states
-  const [toggleNumberColorGradient, setToggleNumberColorGradient] =
-    useState(false)
   const initialState = useKeepGroupedColumnsHidden({
     apiRef,
     initialState: visitorReportStateExportState
@@ -117,8 +114,8 @@ function VisitorMonthlyReport() {
       },
       {}
     )
-
     const resultData = map(visitorPropertyMonth, (data, index) => {
+      const propertyData = propertyDataByKey[data.property_id]
       const {
         delivery_total,
         pick_up_total,
@@ -147,8 +144,28 @@ function VisitorMonthlyReport() {
         others_total: parseInt(others_total),
         wrong_visitor_total: parseInt(wrong_visitor_total),
         check_in_total: parseInt(check_in_total),
+
+        delivery_total_per_unit:
+          parseInt(delivery_total) / propertyData.total_unit,
+        pick_up_total_per_unit:
+          parseInt(pick_up_total) / propertyData.total_unit,
+        drop_off_total_per_unit:
+          parseInt(drop_off_total) / propertyData.total_unit,
+        visitor_total_per_unit:
+          parseInt(visitor_total) / propertyData.total_unit,
+        overnight_total_per_unit:
+          parseInt(overnight_total) / propertyData.total_unit,
+        contractor_total_per_unit:
+          parseInt(contractor_total) / propertyData.total_unit,
+        worker_total_per_unit: parseInt(worker_total) / propertyData.total_unit,
+        others_total_per_unit: parseInt(others_total) / propertyData.total_unit,
+        wrong_visitor_total_per_unit:
+          parseInt(wrong_visitor_total) / propertyData.total_unit,
+        check_in_total_per_unit:
+          parseInt(check_in_total) / propertyData.total_unit,
+
         index: `${index}_${month}_${year}`,
-        ...propertyDataByKey[data.property_id],
+        ...propertyData,
       }
     })
     return resultData
@@ -157,6 +174,18 @@ function VisitorMonthlyReport() {
   //*const
 
   //*functions
+  const generateTotalValueWithField = (array: string[]) => {
+    const newArray = array.map((name) => {
+      return {
+        field: name,
+        headerName: startCase(replace(name, '_total', '')),
+        type: 'number',
+        hide: true,
+      }
+    })
+    return newArray
+  }
+
   const columns: GridColDef[] = [
     {
       field: 'month',
@@ -168,6 +197,7 @@ function VisitorMonthlyReport() {
         return monthArrayObjectPair[params.value]
       },
     },
+
     {
       field: 'name',
       headerName: 'Name',
@@ -231,65 +261,38 @@ function VisitorMonthlyReport() {
       headerName: 'Total Unit',
       type: 'number',
     },
-    {
-      field: 'delivery_total',
-      headerName: 'Delivery',
-      type: 'number',
-    },
-    {
-      field: 'pick_up_total',
-      headerName: 'Pick Up',
-      type: 'number',
-    },
-    {
-      field: 'drop_off_total',
-      headerName: 'Drop Off',
-      type: 'number',
-    },
-    {
-      field: 'visitor_total',
-      headerName: 'Visitor',
-      type: 'number',
-    },
-    {
-      field: 'overnight_total',
-      headerName: 'Overnight',
-      type: 'number',
-    },
-    {
-      field: 'contractor_total',
-      headerName: 'Contractor',
-      type: 'number',
-    },
-    {
-      field: 'worker_total',
-      headerName: 'Worker',
-      type: 'number',
-    },
-    {
-      field: 'others_total',
-      headerName: 'Others',
-      type: 'number',
-    },
-    {
-      field: 'wrong_visitor_total',
-      headerName: 'Wrong Visitor',
-      type: 'number',
-    },
-    {
-      field: 'check_in_total',
-      headerName: 'Check In Total',
-      type: 'number',
-    },
+    ...generateTotalValueWithField([
+      'delivery_total',
+      'delivery_total_per_unit',
+      'pick_up_total',
+      'pick_up_total_per_unit',
+      'drop_off_total',
+      'drop_off_total_per_unit',
+      'visitor_total',
+      'visitor_total_per_unit',
+      'overnight_total',
+      'overnight_total_per_unit',
+      'contractor_total',
+      'contractor_total_per_unit',
+      'worker_total',
+      'worker_total_per_unit',
+      'others_total',
+      'others_total_per_unit',
+      'wrong_visitor_total',
+      'wrong_visitor_total_per_unit',
+      'check_in_total',
+      'check_in_total_per_unit',
+    ]),
   ]
 
-  const getColorNumber = useCallback(
+  const getColorNumberRange = useCallback(
     (value: number, field: string, fieldIncluded: string[]) => {
       if (includes(fieldIncluded, field)) {
         const total = maxBy(
           gridFilteredSortedRowEntriesSelector(apiRef),
           `model.${field}`
-        )?.model[field]
+        )?.model[`${field}`]
+
         if (value < total * 0.2) return 'bluered1'
         if (value < total * 0.4) return 'bluered2'
         if (value < total * 0.6) return 'bluered3'
@@ -314,23 +317,23 @@ function VisitorMonthlyReport() {
               width: '100%',
               '& .bluered1': {
                 color: 'white',
-                backgroundColor: '#00B7FF',
+                backgroundColor: '#D3212C',
               },
               '& .bluered2': {
                 color: 'white',
-                backgroundColor: '#4089BF',
+                backgroundColor: '#FF681E',
               },
               '& .bluered3': {
                 color: 'white',
-                backgroundColor: '#805C80',
+                backgroundColor: '#FF980E',
               },
               '& .bluered4': {
                 color: 'white',
-                backgroundColor: '#BF2E40',
+                backgroundColor: '#069C56',
               },
               '& .bluered5': {
                 color: 'white',
-                backgroundColor: '#FF0000',
+                backgroundColor: '#006B3D',
               },
             }}
           >
@@ -354,24 +357,21 @@ function VisitorMonthlyReport() {
                   showQuickFilter: true,
                   quickFilterProps: { debounceMs: 500 },
                   apiRef: apiRef.current,
-                  toggleNumberColorGradient,
-                  setToggleNumberColorGradient,
                 },
               }}
               getCellClassName={(param) => {
-                if (!toggleNumberColorGradient) return ''
-                return getColorNumber(param.value, param.field, [
-                  'delivery_total',
-                  'pick_up_total',
-                  'drop_off_total',
-                  'visitor_total',
-                  'overnight_total',
-                  'contractor_total',
-                  'worker_total',
-                  'others_total',
-                  'wrong_visitor_total',
-                  'check_in_total',
-                  'total_unit',
+                return getColorNumberRange(param.value, param.field, [
+                  'delivery_total_per_unit',
+                  'pick_up_total_per_unit',
+                  'drop_off_total_per_unit',
+                  'visitor_total_per_unit',
+                  'overnight_total_per_unit',
+                  'contractor_total_per_unit',
+                  'worker_total_per_unit',
+                  'others_total_per_unit',
+                  'wrong_visitor_total_per_unit',
+                  'check_in_total_per_unit',
+                  'total_unit_per_unit',
                 ])
               }}
             />
@@ -382,15 +382,10 @@ function VisitorMonthlyReport() {
   )
 }
 
-function CustomToolbar({
-  apiRef,
-  toggleNumberColorGradient,
-  setToggleNumberColorGradient,
-}: {
-  apiRef: GridApi
-  toggleNumberColorGradient: boolean
-  setToggleNumberColorGradient: (toggle: boolean) => void
-}) {
+function CustomToolbar({ apiRef }: { apiRef: GridApi }) {
+  //*useState
+
+  //*functions
   const handleSaveView = () => {
     if (apiRef.exportState())
       localStorage.setItem(
@@ -428,20 +423,6 @@ function CustomToolbar({
         >
           Reset
         </Button>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Switch
-                size="small"
-                checked={toggleNumberColorGradient}
-                onClick={() =>
-                  setToggleNumberColorGradient(!toggleNumberColorGradient)
-                }
-              />
-            }
-            label="Toggle Color"
-          />
-        </FormGroup>
         <Box sx={{ flex: '1 1 0%;' }} />
         <Box>
           <GridToolbarQuickFilter />
