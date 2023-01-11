@@ -192,7 +192,7 @@ function VisitorMonthlyReport() {
           parseInt(check_in_total) / propertyData.total_unit,
 
         index: `${index}_${month}_${year}`,
-        remark: remarksKeyIndex[`${index}_${month}_${year}`] || '',
+        remark: remarksKeyIndex?.[`${index}_${month}_${year}`] || '',
         ...propertyData,
       }
     })
