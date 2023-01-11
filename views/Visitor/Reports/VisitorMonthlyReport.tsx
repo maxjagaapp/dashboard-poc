@@ -8,7 +8,7 @@ import visitorPropertyMonth from 'assets/visitor_count_property_month.json'
 //*lodash
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
-import maxBy from 'lodash/maxBy'
+import orderBy from 'lodash/orderBy'
 import includes from 'lodash/includes'
 import replace from 'lodash/replace'
 import startCase from 'lodash/startCase'
@@ -29,8 +29,8 @@ import {
   GridToolbarExport,
   GridToolbarDensitySelector,
   GridToolbarQuickFilter,
-  GridApi,
   gridFilteredSortedRowEntriesSelector,
+  useGridApiContext,
 } from '@mui/x-data-grid-premium'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -288,10 +288,11 @@ function VisitorMonthlyReport() {
   const getColorNumberRange = useCallback(
     (value: number, field: string, fieldIncluded: string[]) => {
       if (includes(fieldIncluded, field)) {
-        const total = maxBy(
+        const total = orderBy(
           gridFilteredSortedRowEntriesSelector(apiRef),
-          `model.${field}`
-        )?.model[`${field}`]
+          [`model.${field}`],
+          ['desc']
+        )?.[0]?.model[`${field}`]
 
         if (value < total * 0.2) return 'bluered1'
         if (value < total * 0.4) return 'bluered2'
@@ -301,7 +302,7 @@ function VisitorMonthlyReport() {
       }
       return ''
     },
-    [apiRef]
+    []
   )
 
   return (
@@ -356,7 +357,6 @@ function VisitorMonthlyReport() {
                 toolbar: {
                   showQuickFilter: true,
                   quickFilterProps: { debounceMs: 500 },
-                  apiRef: apiRef.current,
                 },
               }}
               getCellClassName={(param) => {
@@ -382,15 +382,16 @@ function VisitorMonthlyReport() {
   )
 }
 
-function CustomToolbar({ apiRef }: { apiRef: GridApi }) {
+function CustomToolbar() {
+  const apiRef = useGridApiContext()
   //*useState
 
   //*functions
   const handleSaveView = () => {
-    if (apiRef.exportState())
+    if (apiRef.current.exportState())
       localStorage.setItem(
         'visitorReportStateExportState',
-        JSON.stringify(apiRef.exportState())
+        JSON.stringify(apiRef.current.exportState())
       )
   }
 
