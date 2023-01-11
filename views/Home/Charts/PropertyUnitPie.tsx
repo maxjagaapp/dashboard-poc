@@ -53,18 +53,22 @@ function PropertyUnitPie() {
   //*useMemo
   const chartData = useMemo(() => {
     if (isLoading) return { labels: [], datasets: [] }
-    const filteredPropertyData = filter(propertyData, ({ status }) => {
-      switch (status) {
-        case 'Terminated':
-          return Terminated
-        case 'Removed':
-          return Removed
-        case 'Available':
-          return Available
-        default:
-          return true
+    const filteredPropertyData = filter(
+      propertyData,
+      ({ status, property_tag }) => {
+        if (property_tag !== 'Client') return false
+        switch (status) {
+          case 'Terminated':
+            return Terminated
+          case 'Removed':
+            return Removed
+          case 'Available':
+            return Available
+          default:
+            return true
+        }
       }
-    })
+    )
 
     const propertyCountsMap = map(filteredPropertyData, (data) => {
       let labelRange

@@ -24,13 +24,15 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import { green, blue, red, purple, orange, brown } from '@mui/material/colors'
 
+//*lodash
+import startCase from 'lodash/startCase'
+
 //*icons-material
 
 //*interfaces
 
 //*hooks
 import { usePropertyGetAll } from 'hooks/property'
-import { startCase } from 'lodash'
 import { propertyStatusArray } from 'utils/constant'
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
@@ -54,18 +56,22 @@ function PropertyTypePie() {
   //*useMemo
   const chartData = useMemo(() => {
     if (isLoading) return { labels: [], datasets: [] }
-    const filteredPropertyData = filter(propertyData, ({ status }) => {
-      switch (status) {
-        case 'Terminated':
-          return Terminated
-        case 'Removed':
-          return Removed
-        case 'Available':
-          return Available
-        default:
-          return true
+    const filteredPropertyData = filter(
+      propertyData,
+      ({ status, property_tag }) => {
+        if (property_tag !== 'Client') return false
+        switch (status) {
+          case 'Terminated':
+            return Terminated
+          case 'Removed':
+            return Removed
+          case 'Available':
+            return Available
+          default:
+            return true
+        }
       }
-    })
+    )
     const propertyCountsByType = countBy(filteredPropertyData, 'property_type')
 
     return {
