@@ -85,6 +85,9 @@ function VisitorMonthlyReport() {
         localStorage.getItem('visitorReportStateExportState') as string
       )
     : null
+  const remarksKeyIndex = !ISSERVER
+    ? JSON.parse(localStorage?.getItem('remarks_key_index') as string)
+    : null
   const apiRef = useGridApiRef()
   const { data: propertyData, isLoading } = usePropertyGetAll()
   const { propertyCityArray, propertyStateArray } =
@@ -189,6 +192,7 @@ function VisitorMonthlyReport() {
           parseInt(check_in_total) / propertyData.total_unit,
 
         index: `${index}_${month}_${year}`,
+        remark: remarksKeyIndex[`${index}_${month}_${year}`] || '',
         ...propertyData,
       }
     })
@@ -394,11 +398,24 @@ function VisitorMonthlyReport() {
               getRowId={(data) => {
                 return data.index
               }}
+              processRowUpdate={(data) => {
+                const remarks = localStorage?.getItem('remarks_key_index')
+                  ? JSON.parse(
+                      localStorage?.getItem('remarks_key_index') as string
+                    )
+                  : {}
+                remarks[data.index] = data['remark']
+                localStorage.setItem(
+                  'remarks_key_index',
+                  JSON.stringify(remarks)
+                )
+                return data
+              }}
               rows={visitorData}
               columns={columns}
               disableSelectionOnClick
               initialState={initialState}
-              experimentalFeatures={{ aggregation: true }}
+              experimentalFeatures={{ aggregation: true, newEditingApi: true }}
               components={{
                 Toolbar: CustomToolbar,
               }}
