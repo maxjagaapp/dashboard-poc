@@ -5,6 +5,7 @@
 //*components
 import VisitorTypeLine from './Charts/VisitorTypeLine'
 import VisitorMonthlyReport from './Reports/VisitorMonthlyReport'
+import VisitorMonthlyReport2 from './Reports/VisitorMonthlyReport2'
 
 //*material
 import Box from '@mui/material/Box'
@@ -35,6 +36,9 @@ function Visitor() {
           </Grid>
           <Grid xs={12}>
             <VisitorMonthlyReport />
+          </Grid>{' '}
+          <Grid xs={12}>
+            <VisitorMonthlyReport2 />
           </Grid>
         </Grid>
       </Box>
