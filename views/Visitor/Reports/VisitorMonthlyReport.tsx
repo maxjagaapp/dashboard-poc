@@ -31,6 +31,7 @@ import {
   GridToolbarQuickFilter,
   gridFilteredSortedRowEntriesSelector,
   useGridApiContext,
+  GridCellParams,
 } from '@mui/x-data-grid-premium'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -175,12 +176,11 @@ function VisitorMonthlyReport() {
 
   //*functions
   const generateTotalValueWithField = (array: string[]) => {
-    const newArray = array.map((name) => {
+    const newArray: GridColDef[] = array.map((name) => {
       return {
         field: name,
         headerName: startCase(replace(name, '_total', '')),
         type: 'number',
-        hide: true,
       }
     })
     return newArray
@@ -283,27 +283,45 @@ function VisitorMonthlyReport() {
       'check_in_total',
       'check_in_total_per_unit',
     ]),
+    {
+      field: 'remark',
+      headerName: 'Remark',
+      type: 'string',
+      editable: true,
+      minWidth: 200,
+    },
   ]
 
-  const getColorNumberRange = useCallback(
-    (value: number, field: string, fieldIncluded: string[]) => {
-      if (includes(fieldIncluded, field)) {
-        const total = orderBy(
-          gridFilteredSortedRowEntriesSelector(apiRef),
-          [`model.${field}`],
-          ['desc']
-        )?.[0]?.model[`${field}`]
+  const getColorNumberRange = useCallback((params: GridCellParams) => {
+    const { value, field } = params
+    const fieldIncluded = [
+      'delivery_total_per_unit',
+      'pick_up_total_per_unit',
+      'drop_off_total_per_unit',
+      'visitor_total_per_unit',
+      'overnight_total_per_unit',
+      'contractor_total_per_unit',
+      'worker_total_per_unit',
+      'others_total_per_unit',
+      'wrong_visitor_total_per_unit',
+      'check_in_total_per_unit',
+      'total_unit_per_unit',
+    ]
+    if (includes(fieldIncluded, field)) {
+      const total = orderBy(
+        gridFilteredSortedRowEntriesSelector(apiRef),
+        [`model.${field}`],
+        ['desc']
+      )?.[0]?.model[`${field}`]
 
-        if (value < total * 0.2) return 'bluered1'
-        if (value < total * 0.4) return 'bluered2'
-        if (value < total * 0.6) return 'bluered3'
-        if (value < total * 0.7) return 'bluered4'
-        if (value <= total * 1) return 'bluered5'
-      }
-      return ''
-    },
-    []
-  )
+      if (value < total * 0.2) return 'bluered1'
+      if (value < total * 0.4) return 'bluered2'
+      if (value < total * 0.6) return 'bluered3'
+      if (value < total * 0.7) return 'bluered4'
+      if (value <= total * 1) return 'bluered5'
+    }
+    return ''
+  }, [])
 
   return (
     <Card>
@@ -359,21 +377,7 @@ function VisitorMonthlyReport() {
                   quickFilterProps: { debounceMs: 500 },
                 },
               }}
-              getCellClassName={(param) => {
-                return getColorNumberRange(param.value, param.field, [
-                  'delivery_total_per_unit',
-                  'pick_up_total_per_unit',
-                  'drop_off_total_per_unit',
-                  'visitor_total_per_unit',
-                  'overnight_total_per_unit',
-                  'contractor_total_per_unit',
-                  'worker_total_per_unit',
-                  'others_total_per_unit',
-                  'wrong_visitor_total_per_unit',
-                  'check_in_total_per_unit',
-                  'total_unit_per_unit',
-                ])
-              }}
+              getCellClassName={getColorNumberRange}
             />
           </Box>
         </Box>
