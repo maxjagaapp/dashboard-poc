@@ -4,7 +4,6 @@ import { useAuthUser } from '@react-query-firebase/auth'
 
 export function useFirebaseAuth() {
   const query = useAuthUser('user', auth)
-  query.isLoading
 
   //*states
 
