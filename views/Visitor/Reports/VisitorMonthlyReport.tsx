@@ -87,7 +87,7 @@ function VisitorMonthlyReport() {
     : null
   const remarksKeyIndex = !ISSERVER
     ? JSON.parse(localStorage?.getItem('remarks_key_index') as string)
-    : null
+    : {}
   const apiRef = useGridApiRef()
   const { data: propertyData, isLoading } = usePropertyGetAll()
   const { propertyCityArray, propertyStateArray } =
