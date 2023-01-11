@@ -337,11 +337,11 @@ function VisitorMonthlyReport() {
       const { value, field } = params
 
       if (includes(fieldPerUnit, field)) {
-        if (value < maxValueByeEachField[field] * 0.2) return 'bluered1'
-        if (value < maxValueByeEachField[field] * 0.4) return 'bluered2'
-        if (value < maxValueByeEachField[field] * 0.6) return 'bluered3'
-        if (value < maxValueByeEachField[field] * 0.7) return 'bluered4'
-        if (value <= maxValueByeEachField[field] * 1) return 'bluered5'
+        if (value < maxValueByeEachField[field] * 0.2) return 'red'
+        if (value < maxValueByeEachField[field] * 0.4) return 'lightorange'
+        if (value < maxValueByeEachField[field] * 0.6) return 'orange'
+        if (value < maxValueByeEachField[field] * 0.7) return 'green'
+        if (value <= maxValueByeEachField[field] * 1) return 'darkgreen'
       }
       return ''
     },
@@ -359,23 +359,23 @@ function VisitorMonthlyReport() {
             sx={{
               height: '100%',
               width: '100%',
-              '& .bluered1': {
+              '& .red': {
                 color: 'white',
                 backgroundColor: '#D3212C',
               },
-              '& .bluered2': {
+              '& .lightorange': {
                 color: 'white',
                 backgroundColor: '#FF681E',
               },
-              '& .bluered3': {
+              '& .orange': {
                 color: 'white',
                 backgroundColor: '#FF980E',
               },
-              '& .bluered4': {
+              '& .green': {
                 color: 'white',
                 backgroundColor: '#069C56',
               },
-              '& .bluered5': {
+              '& .darkgreen': {
                 color: 'white',
                 backgroundColor: '#006B3D',
               },
