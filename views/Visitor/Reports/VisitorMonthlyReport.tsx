@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState } from 'react'
 import moment from 'moment'
 
 //*assets
@@ -8,10 +8,10 @@ import visitorPropertyMonth from 'assets/visitor_count_property_month.json'
 //*lodash
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
-import orderBy from 'lodash/orderBy'
 import includes from 'lodash/includes'
 import replace from 'lodash/replace'
 import startCase from 'lodash/startCase'
+import maxBy from 'lodash/maxBy'
 
 //*components
 
@@ -32,6 +32,8 @@ import {
   gridFilteredSortedRowEntriesSelector,
   useGridApiContext,
   GridCellParams,
+  GridRowId,
+  GridValidRowModel,
 } from '@mui/x-data-grid-premium'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -45,6 +47,7 @@ import CardContent from '@mui/material/CardContent'
 //*interfaces
 
 //*hooks
+
 import {
   PropertyData,
   usePropertyGetAll,
@@ -59,6 +62,22 @@ import {
 } from 'utils/constant'
 
 const ISSERVER = typeof window === 'undefined'
+
+//*const
+const fieldPerUnit = [
+  'delivery_total_per_unit',
+  'pick_up_total_per_unit',
+  'drop_off_total_per_unit',
+  'visitor_total_per_unit',
+  'overnight_total_per_unit',
+  'contractor_total_per_unit',
+  'worker_total_per_unit',
+  'others_total_per_unit',
+  'wrong_visitor_total_per_unit',
+  'check_in_total_per_unit',
+  'total_unit_per_unit',
+]
+
 function VisitorMonthlyReport() {
   //*define
   const visitorReportStateExportState = !ISSERVER
@@ -71,7 +90,6 @@ function VisitorMonthlyReport() {
   const { propertyCityArray, propertyStateArray } =
     useGetAllPropertyLocationInArray()
 
-  //*states
   const initialState = useKeepGroupedColumnsHidden({
     apiRef,
     initialState: visitorReportStateExportState
@@ -98,6 +116,11 @@ function VisitorMonthlyReport() {
           },
         },
   })
+
+  //*states
+  const [filteredRow, setFilteredRow] = useState<
+    { id: GridRowId; model: GridValidRowModel }[]
+  >([])
 
   //*useMemo
   const visitorData = useMemo(() => {
@@ -186,142 +209,140 @@ function VisitorMonthlyReport() {
     return newArray
   }
 
-  const columns: GridColDef[] = [
-    {
-      field: 'month',
-      headerName: 'Month',
-      type: 'singleSelect',
-      valueOptions: monthInNumberArray,
-
-      valueFormatter: (params) => {
-        return monthArrayObjectPair[params.value]
+  const maxValueByeEachField: Record<string, number> = useMemo(() => {
+    return reduce(
+      fieldPerUnit,
+      (temp: Record<string, number>, value) => {
+        temp[value] = maxBy(filteredRow, `model.${value}`)?.model[value]
+        return temp
       },
-    },
+      {}
+    )
+  }, [filteredRow])
 
-    {
-      field: 'name',
-      headerName: 'Name',
-      minWidth: 200,
-    },
-    {
-      field: 'first_address',
-      headerName: 'Address 1',
-      minWidth: 200,
-    },
-    {
-      field: 'second_address',
-      headerName: 'Address 2',
-      minWidth: 200,
-    },
-    {
-      field: 'city',
-      headerName: 'City',
-      type: 'singleSelect',
-      valueOptions: propertyCityArray,
-    },
-    {
-      field: 'state',
-      headerName: 'State',
-      type: 'singleSelect',
-      valueOptions: propertyStateArray,
-    },
-    {
-      field: 'property_type',
-      headerName: 'Property Type',
-      type: 'singleSelect',
-      valueOptions: propertyTypeArray,
-    },
-    {
-      field: 'property_tag',
-      headerName: 'Property Tag',
-      type: 'singleSelect',
-      valueOptions: propertyTagArray,
-    },
-    {
-      field: 'status',
-      headerName: 'Status',
-      type: 'singleSelect',
-      valueOptions: propertyStatusArray,
-    },
-    {
-      field: 'commencement_at',
-      headerName: 'Commencement Date',
-      minWidth: 150,
-      type: 'date',
-      valueFormatter: (params: GridValueFormatterParams) => {
-        if (params?.value) return moment(params?.value).format('DD/MM/YYYY')
-        return null
-      },
-      valueGetter: (params: GridValueGetterParams) => {
-        return params?.value?.toDate()
-      },
-    },
-    {
-      field: 'total_unit',
-      headerName: 'Total Unit',
-      type: 'number',
-    },
-    ...generateTotalValueWithField([
-      'delivery_total',
-      'delivery_total_per_unit',
-      'pick_up_total',
-      'pick_up_total_per_unit',
-      'drop_off_total',
-      'drop_off_total_per_unit',
-      'visitor_total',
-      'visitor_total_per_unit',
-      'overnight_total',
-      'overnight_total_per_unit',
-      'contractor_total',
-      'contractor_total_per_unit',
-      'worker_total',
-      'worker_total_per_unit',
-      'others_total',
-      'others_total_per_unit',
-      'wrong_visitor_total',
-      'wrong_visitor_total_per_unit',
-      'check_in_total',
-      'check_in_total_per_unit',
-    ]),
-    {
-      field: 'remark',
-      headerName: 'Remark',
-      type: 'string',
-      editable: true,
-      minWidth: 200,
-    },
-  ]
+  const columns: GridColDef[] = useMemo(() => {
+    return [
+      {
+        field: 'month',
+        headerName: 'Month',
+        type: 'singleSelect',
+        valueOptions: monthInNumberArray,
 
-  const getColorNumberRange = useCallback((params: GridCellParams) => {
-    const { value, field } = params
-    const fieldIncluded = [
-      'delivery_total_per_unit',
-      'pick_up_total_per_unit',
-      'drop_off_total_per_unit',
-      'visitor_total_per_unit',
-      'overnight_total_per_unit',
-      'contractor_total_per_unit',
-      'worker_total_per_unit',
-      'others_total_per_unit',
-      'wrong_visitor_total_per_unit',
-      'check_in_total_per_unit',
-      'total_unit_per_unit',
+        valueFormatter: (params) => {
+          return monthArrayObjectPair[params.value]
+        },
+      },
+
+      {
+        field: 'name',
+        headerName: 'Name',
+        minWidth: 200,
+      },
+      {
+        field: 'first_address',
+        headerName: 'Address 1',
+        minWidth: 200,
+      },
+      {
+        field: 'second_address',
+        headerName: 'Address 2',
+        minWidth: 200,
+      },
+      {
+        field: 'city',
+        headerName: 'City',
+        type: 'singleSelect',
+        valueOptions: propertyCityArray,
+      },
+      {
+        field: 'state',
+        headerName: 'State',
+        type: 'singleSelect',
+        valueOptions: propertyStateArray,
+      },
+      {
+        field: 'property_type',
+        headerName: 'Property Type',
+        type: 'singleSelect',
+        valueOptions: propertyTypeArray,
+      },
+      {
+        field: 'property_tag',
+        headerName: 'Property Tag',
+        type: 'singleSelect',
+        valueOptions: propertyTagArray,
+      },
+      {
+        field: 'status',
+        headerName: 'Status',
+        type: 'singleSelect',
+        valueOptions: propertyStatusArray,
+      },
+      {
+        field: 'commencement_at',
+        headerName: 'Commencement Date',
+        minWidth: 150,
+        type: 'date',
+        valueFormatter: (params: GridValueFormatterParams) => {
+          if (params?.value) return moment(params?.value).format('DD/MM/YYYY')
+          return null
+        },
+        valueGetter: (params: GridValueGetterParams) => {
+          return params?.value?.toDate()
+        },
+      },
+      {
+        field: 'total_unit',
+        headerName: 'Total Unit',
+        type: 'number',
+      },
+      ...generateTotalValueWithField([
+        'delivery_total',
+        'delivery_total_per_unit',
+        'pick_up_total',
+        'pick_up_total_per_unit',
+        'drop_off_total',
+        'drop_off_total_per_unit',
+        'visitor_total',
+        'visitor_total_per_unit',
+        'overnight_total',
+        'overnight_total_per_unit',
+        'contractor_total',
+        'contractor_total_per_unit',
+        'worker_total',
+        'worker_total_per_unit',
+        'others_total',
+        'others_total_per_unit',
+        'wrong_visitor_total',
+        'wrong_visitor_total_per_unit',
+        'check_in_total',
+        'check_in_total_per_unit',
+      ]),
+      {
+        field: 'remark',
+        headerName: 'Remark',
+        type: 'string',
+        editable: true,
+        minWidth: 200,
+      },
     ]
-    if (includes(fieldIncluded, field)) {
-      const total = orderBy(
-        gridFilteredSortedRowEntriesSelector(apiRef),
-        [`model.${field}`],
-        ['desc']
-      )?.[0]?.model[`${field}`]
+  }, [propertyCityArray, propertyStateArray])
 
-      if (value < total * 0.2) return 'bluered1'
-      if (value < total * 0.4) return 'bluered2'
-      if (value < total * 0.6) return 'bluered3'
-      if (value < total * 0.7) return 'bluered4'
-      if (value <= total * 1) return 'bluered5'
-    }
-    return ''
-  }, [])
+  const getColorNumberRange = useCallback(
+    (params: GridCellParams) => {
+      const { value, field } = params
+
+      if (includes(fieldPerUnit, field)) {
+        if (value < maxValueByeEachField[field] * 0.2) return 'bluered1'
+        if (value < maxValueByeEachField[field] * 0.4) return 'bluered2'
+        if (value < maxValueByeEachField[field] * 0.6) return 'bluered3'
+        if (value < maxValueByeEachField[field] * 0.7) return 'bluered4'
+        if (value <= maxValueByeEachField[field] * 1) return 'bluered5'
+      }
+      return ''
+    },
+    [maxValueByeEachField]
+  )
 
   return (
     <Card>
@@ -357,6 +378,16 @@ function VisitorMonthlyReport() {
             }}
           >
             <DataGridPremium
+              onStateChange={(state) => {
+                if (state.rows.ids.length > 0) {
+                  setFilteredRow(
+                    gridFilteredSortedRowEntriesSelector(
+                      state,
+                      apiRef.current.instanceId
+                    )
+                  )
+                }
+              }}
               apiRef={apiRef}
               density="compact"
               rowGroupingColumnMode="multiple"
