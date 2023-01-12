@@ -14,9 +14,9 @@ import Grid from '@mui/material/Unstable_Grid2'
 
 //*icons-material
 
-//*interfaces
+//*interface
 
-//*consts
+//*const
 
 function Visitor() {
   //*define

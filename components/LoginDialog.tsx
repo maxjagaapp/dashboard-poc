@@ -4,6 +4,7 @@ import * as yup from 'yup'
 //*lodash
 
 //*components
+import StyleTextField from './StyledTextField'
 
 //*material
 import Box from '@mui/material/Box'
@@ -13,12 +14,11 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import Stack from '@mui/material/Stack'
 import DialogTitle from '@mui/material/DialogTitle'
-import TextField from '@mui/material/TextField'
 import CircularProgress from '@mui/material/CircularProgress'
 
 //*icons-material
 
-//*interfaces
+//*interface
 
 //*hooks
 import { useFirebaseAuth, loginWithEmailAndPassword } from 'hooks/auth'
@@ -88,23 +88,19 @@ function LoginDialog() {
             <DialogContent dividers>
               <form onSubmit={formik.handleSubmit}>
                 <Stack spacing={2}>
-                  <TextField
-                    size="small"
+                  <StyleTextField
                     id="email"
                     label="Email Address"
                     type="email"
-                    fullWidth
                     onChange={formik.handleChange}
                     value={formik.values.email}
                     error={Boolean(formik.errors.email)}
                     helperText={formik.errors.email}
                   />
-                  <TextField
-                    size="small"
+                  <StyleTextField
                     id="password"
                     label="Password"
                     type="password"
-                    fullWidth
                     value={formik.values.password}
                     onChange={formik.handleChange}
                     error={Boolean(formik.errors.password)}

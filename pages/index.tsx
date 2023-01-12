@@ -1,7 +1,7 @@
-import Home from 'views/Home'
+import HomeView from 'views/Home'
 
 function Index() {
-  return <Home />
+  return <HomeView />
 }
 
 export default Index

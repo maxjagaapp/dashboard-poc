@@ -38,7 +38,7 @@ import CardContent from '@mui/material/CardContent'
 
 //*icons-material
 
-//*interfaces
+//*interface
 
 //*hooks
 
@@ -59,7 +59,7 @@ function VisitorMonthlyReport2() {
     : {}
 
   const apiRef = useGridApiRef()
-  const { data: propertyData, isLoading } = usePropertyGetAll()
+  const { propertyData, isPropertyLoading } = usePropertyGetAll()
   const { propertyCityArray, propertyStateArray } =
     useGetAllPropertyLocationInArray()
 
@@ -75,7 +75,7 @@ function VisitorMonthlyReport2() {
 
   //*useMemo
   const visitorData = useMemo(() => {
-    if (isLoading) return []
+    if (isPropertyLoading) return []
     const resultData = map(propertyData, (propertyData, index) => {
       const findData =
         find(visitorCountUsing, { property_id: propertyData.id }) || null
@@ -129,7 +129,7 @@ function VisitorMonthlyReport2() {
       }
     })
     return resultData
-  }, [propertyData, isLoading])
+  }, [propertyData, isPropertyLoading])
 
   //*const
 

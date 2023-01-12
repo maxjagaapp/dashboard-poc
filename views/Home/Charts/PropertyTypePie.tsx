@@ -29,22 +29,22 @@ import startCase from 'lodash/startCase'
 
 //*icons-material
 
-//*interfaces
+//*interface
 
 //*hooks
 import { usePropertyGetAll } from 'hooks/property'
+
+//*utils
 import { propertyStatusArray } from 'utils/constant'
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
 
-//*consts
-
 function PropertyTypePie() {
   //*define
-  const { data: propertyData, isLoading } = usePropertyGetAll()
+  const { propertyData, isPropertyLoading } = usePropertyGetAll()
 
   //*states
-  const [state, setState] = useState<{ [key: string]: boolean }>({
+  const [state, setState] = useState<Record<string, boolean>>({
     Available: true,
     Terminated: false,
     Removed: false,
@@ -55,7 +55,7 @@ function PropertyTypePie() {
 
   //*useMemo
   const chartData = useMemo(() => {
-    if (isLoading) return { labels: [], datasets: [] }
+    if (isPropertyLoading) return { labels: [], datasets: [] }
     const filteredPropertyData = filter(
       propertyData,
       ({ status, property_tag }) => {
@@ -100,8 +100,9 @@ function PropertyTypePie() {
         },
       ],
     }
-  }, [isLoading, propertyData, Terminated, Removed, Available])
+  }, [isPropertyLoading, propertyData, Terminated, Removed, Available])
 
+  //*functions
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setState({
       ...state,

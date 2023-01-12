@@ -1,9 +1,9 @@
 /* eslint-disable import/no-anonymous-default-export */
-import { red, blue, grey } from '@mui/material/colors'
+import { red, grey } from '@mui/material/colors'
+import { PaletteOptions } from '@mui/material/styles/createPalette'
 
 const white = '#FFFFFF'
-
-export default {
+const palette: PaletteOptions = {
   primary: {
     contrastText: white,
     dark: '#af1a18',
@@ -25,13 +25,12 @@ export default {
   text: {
     primary: '#333333',
     secondary: '#333333',
-    link: blue[600],
   },
-  link: blue[800],
-  icon: '#ad2425',
   background: {
     default: '#F4F6F8',
     paper: white,
   },
   divider: grey[200],
 }
+
+export default palette

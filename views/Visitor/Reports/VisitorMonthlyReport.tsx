@@ -44,7 +44,7 @@ import CardContent from '@mui/material/CardContent'
 
 //*icons-material
 
-//*interfaces
+//*interface
 
 //*hooks
 
@@ -89,7 +89,7 @@ function VisitorMonthlyReport() {
     ? JSON.parse(localStorage?.getItem('remarks_key_index') as string)
     : {}
   const apiRef = useGridApiRef()
-  const { data: propertyData, isLoading } = usePropertyGetAll()
+  const { propertyData, isPropertyLoading } = usePropertyGetAll()
   const { propertyCityArray, propertyStateArray } =
     useGetAllPropertyLocationInArray()
 
@@ -127,7 +127,7 @@ function VisitorMonthlyReport() {
 
   //*useMemo
   const visitorData = useMemo(() => {
-    if (isLoading) return []
+    if (isPropertyLoading) return []
     const propertyDataByKey = reduce(
       propertyData,
       (
@@ -197,7 +197,7 @@ function VisitorMonthlyReport() {
       }
     })
     return resultData
-  }, [propertyData, isLoading])
+  }, [propertyData, isPropertyLoading])
 
   //*const
 

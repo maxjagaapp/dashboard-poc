@@ -29,11 +29,11 @@ import find from 'lodash/find'
 import map from 'lodash/map'
 
 //*components
+import StyleTextField from 'components/StyledTextField'
 
 //*material
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import TextField from '@mui/material/TextField'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
@@ -48,7 +48,7 @@ import {
   brown,
 } from '@mui/material/colors'
 import { LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { AdapterMoment } from '@mui/x-date-pickers-pro/AdapterMoment'
 import {
   DateRangePicker,
   DateRange,
@@ -58,7 +58,7 @@ import CardContent from '@mui/material/CardContent'
 
 //*icons-material
 
-//*interfaces
+//*interface
 interface VisitorData {
   check_in_date: Date
   delivery_total: number
@@ -93,7 +93,7 @@ ChartJS.register(
   ChartDataLabels
 )
 
-//*consts
+//*const
 const generateVisitorDatasets = (data: VisitorData[]) => {
   return [
     {
@@ -320,9 +320,9 @@ function VisitorTypeLine() {
                 }}
                 renderInput={(startProps, endProps) => (
                   <>
-                    <TextField size="small" {...startProps} />
+                    <StyleTextField {...startProps} />
                     <Box sx={{ mx: 2 }}> to </Box>
-                    <TextField size="small" {...endProps} />
+                    <StyleTextField {...endProps} />
                   </>
                 )}
               />

@@ -2,12 +2,16 @@ import { useMemo } from 'react'
 import { useFirestoreQuery } from '@react-query-firebase/firestore'
 import { query, collection, DocumentData } from 'firebase/firestore'
 
+//*lodash
 import startCase from 'lodash/startCase'
-import groupBy from 'lodash/groupBy'
-import keys from 'lodash/keys'
 
+//*config
 import { firestore } from 'config/firebase'
 
+//*helpers
+import { getArrayKeyWithObject } from 'helpers/objectHelpers'
+
+//*interface
 export interface PropertyData {
   id: string
   name: string
@@ -21,13 +25,16 @@ export interface PropertyData {
   total_unit: number
 }
 
-export function usePropertyGetAll() {
+export function usePropertyGetAll(): {
+  propertyData: PropertyData[]
+  isPropertyLoading: boolean
+} {
   //*define
   const ref = query(collection(firestore, 'properties'))
   const queryData = useFirestoreQuery(['properties'], ref)
 
   //*useMemo
-  const data = useMemo((): PropertyData[] => {
+  const propertyData = useMemo((): PropertyData[] => {
     if (queryData.data)
       return queryData.data.docs.map((docSnapshot: DocumentData) => {
         return {
@@ -53,25 +60,27 @@ export function usePropertyGetAll() {
 
   //*useEffect
 
-  return { data, isLoading: queryData.isLoading }
+  return { propertyData, isPropertyLoading: queryData.isLoading }
 }
 
 export function useGetAllPropertyLocationInArray() {
   //*define
-  const { data, isLoading } = usePropertyGetAll()
+  const { propertyData, isPropertyLoading } = usePropertyGetAll()
 
   //*states
 
   //*useMemo
   const propertyCityArray = useMemo(() => {
-    if (isLoading) return []
-    return keys(groupBy(data, 'city')).sort()
-  }, [data, isLoading])
+    if (isPropertyLoading) return []
+    const { keyArray } = getArrayKeyWithObject(propertyData, 'city')
+    return keyArray
+  }, [propertyData, isPropertyLoading])
 
   const propertyStateArray = useMemo(() => {
-    if (isLoading) return []
-    return keys(groupBy(data, 'state')).sort()
-  }, [data, isLoading])
+    if (isPropertyLoading) return []
+    const { keyArray } = getArrayKeyWithObject(propertyData, 'state')
+    return keyArray
+  }, [propertyData, isPropertyLoading])
 
   //*useEffect
 

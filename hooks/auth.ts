@@ -1,8 +1,14 @@
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
-import { auth } from 'config/firebase'
+import { signInWithEmailAndPassword, signOut, User } from 'firebase/auth'
 import { useAuthUser } from '@react-query-firebase/auth'
 
-export function useFirebaseAuth() {
+//*config
+import { auth } from 'config/firebase'
+
+export function useFirebaseAuth(): {
+  isAuth: boolean
+  loading: boolean
+  user: User | undefined
+} {
   const query = useAuthUser('user', auth)
 
   //*states

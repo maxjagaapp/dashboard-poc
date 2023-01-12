@@ -10,7 +10,7 @@ import Box from '@mui/material/Box'
 //*icons-material
 import MenuIcon from '@mui/icons-material/Menu'
 
-//*interfaces
+//*interface
 
 //*hooks
 

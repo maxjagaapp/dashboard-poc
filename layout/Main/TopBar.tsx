@@ -19,7 +19,7 @@ import MenuItem from '@mui/material/MenuItem'
 //*icons-material
 import MenuIcon from '@mui/icons-material/Menu'
 
-//*interfaces
+//*interface
 
 function TopBar() {
   //*define

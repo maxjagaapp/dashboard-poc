@@ -9,7 +9,7 @@ import { useFirebaseAuth } from 'hooks/auth'
 
 //*icons-material
 
-//*interfaces
+//*interface
 interface MainProps {
   children: JSX.Element
 }

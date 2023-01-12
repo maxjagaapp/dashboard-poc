@@ -1,5 +1,4 @@
 import { createTheme } from '@mui/material/styles'
-import components from './components'
 import typography from './typography'
 import palette from './palette'
 import breakpoints from './breakpoints'
@@ -8,7 +7,6 @@ import breakpoints from './breakpoints'
 
 const baseTheme = {
   palette,
-  components,
   typography,
   breakpoints,
 }
