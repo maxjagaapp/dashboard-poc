@@ -19,6 +19,9 @@ import MenuItem from '@mui/material/MenuItem'
 //*icons-material
 import MenuIcon from '@mui/icons-material/Menu'
 
+//*hooks
+import { logout } from 'hooks/auth'
+
 //*interface
 
 function TopBar() {
@@ -47,6 +50,7 @@ function TopBar() {
           <MenuItem onClick={() => handleGoToPage('/visitor')}>
             Visitor
           </MenuItem>
+          <MenuItem onClick={logout}>Log Out</MenuItem>
         </Menu>
       </Toolbar>
     </AppBar>
