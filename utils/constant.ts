@@ -9,6 +9,14 @@ export const propertyTypeArray = [
 export const propertyStatusArray = ['Available', 'Terminated', 'Removed']
 
 export const monthInNumberArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+export const yearInNumberArray = [
+  '2018',
+  '2019',
+  '2020',
+  '2021',
+  '2022',
+  '2023',
+]
 
 export const monthInStringArray = [
   'Jan',

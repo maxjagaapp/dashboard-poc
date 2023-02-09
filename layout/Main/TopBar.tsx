@@ -50,6 +50,9 @@ function TopBar() {
           <MenuItem onClick={() => handleGoToPage('/visitor')}>
             Visitor
           </MenuItem>
+          <MenuItem onClick={() => handleGoToPage('/feedback')}>
+            Feedback
+          </MenuItem>
           <MenuItem onClick={logout}>Log Out</MenuItem>
         </Menu>
       </Toolbar>
